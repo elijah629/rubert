@@ -7,7 +7,7 @@ import { defineConfig } from "vite";
 import path from "node:path";
 
 export default defineConfig({
-	plugins: [solid({ adapter: vercel() }), wasm(), topLevelAwait()],
+	plugins: [solid({ adapter: vercel(), ssr: false }), wasm(), topLevelAwait()],
 	build: {
 		target: "esnext"
 	},
