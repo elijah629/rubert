@@ -1,22 +1,35 @@
 use core::fmt;
+use wasm_bindgen::JsValue;
 
 #[derive(Debug)]
 pub enum Error {
     InvalidColor,
     InvalidEdge,
     InvalidCorner,
-    TooManyPieces,
+    TooManySame,
+    NoSolution,
     UnsolveableCube,
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::TooManyPieces => "Too many facelets on a color",
-            Self::InvalidColor => "Invalid color value",
-            Self::InvalidEdge => "Invalid edge value",
-            Self::InvalidCorner => "Invalid corner value",
-            Self::UnsolveableCube => "Unsolveable Cube",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::InvalidColor => "Invalid color during conversion",
+                Self::InvalidEdge => "Invalid edge during conversion",
+                Self::InvalidCorner => "Invalid corner during conversion",
+                Self::UnsolveableCube => "The cube is unsolveable",
+                Self::TooManySame => "More than 9 facelets of the same color",
+                Self::NoSolution => "The solver did not find a solution",
+            }
+        )
+    }
+}
+
+impl Into<JsValue> for Error {
+    fn into(self) -> JsValue {
+        self.to_string().into()
     }
 }

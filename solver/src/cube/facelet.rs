@@ -52,12 +52,12 @@ impl TryFrom<&[u8]> for Cube {
         }
 
         if counts.values().any(|&x| x != 9) {
-            return Err(Error::TooManyPieces);
+            return Err(Error::TooManySame);
         }
 
         for (i, &c) in facelets.into_iter().enumerate() {
             cube.facelets[i] = Color::try_from(c)?;
-        }            
+        }
 
         Ok(cube)
     }
