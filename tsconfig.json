@@ -1,4 +1,4 @@
-/*{
+{
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
@@ -11,24 +11,6 @@
 		"baseUrl": "./",
 		"paths": {
 			"@/*": ["./src/*"]
-		}
-	}
-}
-*/{
-	"compilerOptions": {
-		"strict": true,
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "node",
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"jsx": "preserve",
-		"jsxImportSource": "solid-js",
-		"noEmit": true,
-		"isolatedModules": true,
-		"baseUrl": ".",
-		"paths": {
-		  "@/*": ["src/*"]
 		}
 	}
 }

@@ -1,19 +1,19 @@
 {
-	"name": "solver",
-	"collaborators": [
-		"elijah629 <62805599+elijah629@users.noreply.github.com>"
-	],
-	"version": "0.1.0",
-	"files": [
-		"solver_bg.wasm",
-		"solver.js",
-		"solver_bg.js",
-		"solver.d.ts"
-	],
-	"module": "solver.js",
-	"types": "solver.d.ts",
-	"sideEffects": [
-		"./solver.js",
-		"./snippets/*"
-	]
+  "name": "solver",
+  "collaborators": [
+    "elijah629 <62805599+elijah629@users.noreply.github.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "solver_bg.wasm",
+    "solver.js",
+    "solver_bg.js",
+    "solver.d.ts"
+  ],
+  "module": "solver.js",
+  "types": "solver.d.ts",
+  "sideEffects": [
+    "./solver.js",
+    "./snippets/*"
+  ]
 }

@@ -7,8 +7,8 @@ export default function NotFound() {
 		<>
 			<Title>Not Found</Title>
 			<HttpStatusCode code={404} />
-			<h1>(Insert the word LOST made with Rubik's cubes)</h1>
-			<A href="/">Get outta here</A>
+			<p>Not found, womp womp</p>
+			<A href="/" class="font-medium underline underline-offset-4">Get outta here</A>
 		</>
 	);
 }

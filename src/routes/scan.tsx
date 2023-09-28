@@ -4,6 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Cube, PartialCube, FaceletColor, facelet_color } from "@/lib/cube";
 import { createSignal, For, onMount } from "solid-js";
 import { scan_cube } from "@/lib/scanning";
+import SolveButton from "@/components/SolveButton";
+import ColorPicker from "@/components/ColorPicker";
 
 export default function Scan() {
 	let canvas!: HTMLCanvasElement;
@@ -20,10 +22,12 @@ export default function Scan() {
 	});
 
 	onMount(async () => {
-    	const getUserMedia: typeof navigator.mediaDevices.getUserMedia =
-	    	window.navigator.mediaDevices?.getUserMedia.bind(window.navigator.mediaDevices) ||
-    		(window.navigator as any).webkitGetUserMedia ||
-    		(window.navigator as any).mozGetUserMedia;
+		const getUserMedia: typeof navigator.mediaDevices.getUserMedia =
+			window.navigator.mediaDevices?.getUserMedia.bind(
+				window.navigator.mediaDevices
+			) ||
+			(window.navigator as any).webkitGetUserMedia ||
+			(window.navigator as any).mozGetUserMedia;
 
 		const RES = 1000;
 
@@ -79,13 +83,14 @@ export default function Scan() {
 
 	return (
 		<>
-			<Card class="flex sm:flex-row flex-col sm:h-80 justify-between p-4">
+			<script async type="text/javascript" src="/js/opencv.js"></script>
+			<Card class="flex flex-col justify-between p-4 sm:h-80 sm:flex-row">
 				<canvas
 					ref={canvas}
-					class="rounded-md h-full w-auto border-2"></canvas>
+					class="h-full w-auto rounded-md border-2"></canvas>
 				<video
 					id="wci"
-					class="rounded-md h-full w-auto border-2"
+					class="h-full w-auto rounded-md border-2"
 					playsinline
 					autoplay
 					muted
@@ -105,39 +110,8 @@ export default function Scan() {
 				}}
 			/>
 			<div class="flex items-end justify-between p-4">
-				<Card class="grid grid-cols-3 grid-rows-2 gap-1 p-4">
-					<For each={[...Array(6).keys()]}>
-						{fcolor => {
-							const [h, s, l] = facelet_color[fcolor as any];
-							return (
-								<div
-									onClick={() => setColor(fcolor)}
-									class={`h-10 w-10 rounded-sm text-destructive-foreground ring-offset-background transition-all hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-										color() === fcolor
-											? "border-2 border-primary"
-											: "border"
-									}`}
-									style={{
-										background: `hsl(${h}deg, ${s}%, ${l}%)`
-									}}></div>
-							);
-						}}
-					</For>
-				</Card>
-				<Button
-					onClick={() => {
-						const cube_string = Cube.from_partial(cube())
-							.wasm_facelets()
-							.join("");
-						window
-							.open(
-								`${window.origin}/solve/${cube_string}`,
-								"_blank"
-							)
-							?.focus();
-					}}>
-					Solve
-				</Button>
+				<ColorPicker value={color()} onChange={x => setColor(x)}/>
+				<SolveButton cube={cube()}/>
 			</div>
 		</>
 	);

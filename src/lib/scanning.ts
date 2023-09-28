@@ -1,7 +1,7 @@
 import { Cube, FaceletColor, Face } from "@/lib/cube";
 
 export namespace cv {
-   	export type Point = InstanceType<typeof window.cv.Point>;
+	export type Point = InstanceType<typeof window.cv.Point>;
 	export type Mat = InstanceType<typeof window.cv.Mat>;
 	export type Rect = InstanceType<typeof window.cv.Rect>;
 	export type RotatedRect = InstanceType<typeof window.cv.RotatedRect>;

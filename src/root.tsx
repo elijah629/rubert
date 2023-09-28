@@ -12,7 +12,6 @@ import {
 	Title
 } from "solid-start";
 import Navbar from "./components/navbar";
-import { Toaster } from "./components/ui/toast";
 import "./root.css";
 
 export default function Root() {
@@ -33,10 +32,8 @@ export default function Root() {
 						<Routes>
 							<FileRoutes />
 						</Routes>
-						<Toaster />
 					</ErrorBoundary>
 				</Suspense>
-				<script src="/js/opencv.js"></script>
 				<Scripts />
 			</Body>
 		</Html>

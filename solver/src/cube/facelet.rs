@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::error::Error;
 
 /// Names the colors of the cube facelets: up, right, face, down, left, back.
@@ -44,9 +46,18 @@ impl TryFrom<&[u8]> for Cube {
     fn try_from(facelets: &[u8]) -> Result<Self, Self::Error> {
         let mut cube = IDENTITY_CUBE;
 
+        let mut counts: HashMap<u8, usize> = HashMap::new();
+        for &x in facelets {
+            *counts.entry(x).or_default() += 1;
+        }
+
+        if counts.values().any(|&x| x != 9) {
+            return Err(Error::TooManyPieces);
+        }
+
         for (i, &c) in facelets.into_iter().enumerate() {
             cube.facelets[i] = Color::try_from(c)?;
-        }
+        }            
 
         Ok(cube)
     }
