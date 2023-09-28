@@ -84,7 +84,6 @@ export default function Scan() {
 	return (
 		<>
 			<script
-				async
 				type="text/javascript"
 				src="/js/opencv.js"></script>
 			<Card class="flex flex-col justify-between p-4 sm:h-80 sm:flex-row">
