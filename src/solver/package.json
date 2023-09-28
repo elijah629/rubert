@@ -7,13 +7,11 @@
   "files": [
     "solver_bg.wasm",
     "solver.js",
-    "solver_bg.js",
     "solver.d.ts"
   ],
   "module": "solver.js",
   "types": "solver.d.ts",
   "sideEffects": [
-    "./solver.js",
     "./snippets/*"
   ]
 }

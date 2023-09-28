@@ -32,8 +32,11 @@ export default function Manual() {
 			/>
 
 			<div class="flex items-end justify-between p-4">
-				<ColorPicker value={color()} onChange={x => setColor(x)}/>
-				<SolveButton cube={cube()}/>
+				<ColorPicker
+					value={color()}
+					onChange={x => setColor(x)}
+				/>
+				<SolveButton cube={cube()} />
 			</div>
 		</>
 	);

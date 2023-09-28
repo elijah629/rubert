@@ -8,7 +8,11 @@ export default function NotFound() {
 			<Title>Not Found</Title>
 			<HttpStatusCode code={404} />
 			<p>Not found, womp womp</p>
-			<A href="/" class="font-medium underline underline-offset-4">Get outta here</A>
+			<A
+				href="/"
+				class="font-medium underline underline-offset-4">
+				Get outta here
+			</A>
 		</>
 	);
 }

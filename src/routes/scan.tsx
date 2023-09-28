@@ -83,7 +83,10 @@ export default function Scan() {
 
 	return (
 		<>
-			<script async type="text/javascript" src="/js/opencv.js"></script>
+			<script
+				async
+				type="text/javascript"
+				src="/js/opencv.js"></script>
 			<Card class="flex flex-col justify-between p-4 sm:h-80 sm:flex-row">
 				<canvas
 					ref={canvas}
@@ -110,8 +113,11 @@ export default function Scan() {
 				}}
 			/>
 			<div class="flex items-end justify-between p-4">
-				<ColorPicker value={color()} onChange={x => setColor(x)}/>
-				<SolveButton cube={cube()}/>
+				<ColorPicker
+					value={color()}
+					onChange={x => setColor(x)}
+				/>
+				<SolveButton cube={cube()} />
 			</div>
 		</>
 	);
