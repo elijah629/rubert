@@ -20,7 +20,10 @@ export default function Root() {
 		<Html lang="en">
 			<Head>
 				<Title>Rubert - The fastest rubiks cube solver</Title>
-				<Link rel="icon" href="favicon.ico" />
+				<Link
+					rel="icon"
+					href="favicon.ico"
+				/>
 				<Meta charset="utf-8" />
 				<Meta
 					name="viewport"

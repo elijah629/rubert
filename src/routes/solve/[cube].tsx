@@ -25,7 +25,7 @@ export default function Solve() {
 					throw "Invalid cube, at least one of the facelets is not a number from 0 to 5";
 				}
 
-				return solve(Uint8Array.from(digits))
+				return solve(Uint8Array.from(digits));
 			})
 		);
 	});
@@ -68,7 +68,11 @@ export default function Solve() {
 						},
 						err(e) {
 							console.log(e);
-							return <p class="font-bold rounded-md p-4 bg-destructive">Error: {e}</p>;
+							return (
+								<p class="rounded-md bg-destructive p-4 font-bold">
+									Error: {e}
+								</p>
+							);
 						}
 					})}
 				</>
