@@ -92,7 +92,7 @@ function hsv_to_facelet(color: [number, number, number]): FaceletColor | null {
 	);
 }
 
-function rank_TBLR(point: cv.Point, width: number, max_diff: number): number {
+/*function rank_TBLR(point: cv.Point, width: number, max_diff: number): number {
 	return Math.floor(point.y / max_diff) * max_diff * width + point.x;
 }
 
@@ -126,7 +126,7 @@ function rotate_points(angle: number, center: cv.Point, points: cv.Point[]) {
 		(points[i].x = c * x + s * y + center.x),
 			(points[i].y = c * y - s * x + center.y);
 	}
-}
+}*/
 
 /**
  * Mutates {frame}, and adds squares surrounding cube facelets to it
@@ -225,7 +225,7 @@ export function scan_cube(frame: cv.Mat): false | Partial<Cube> {
 
 	if (squares.length === 9) {
 		// Find avg_rot and avg_center
-		const avg_rot =
+	/*	const avg_rot =
 			squares.map(x => x[0].angle - 90).reduce((a, b) => a + b) / 9;
 		const acc_center = squares
 			.map(x => x[0].center)
@@ -240,52 +240,51 @@ export function scan_cube(frame: cv.Mat): false | Partial<Cube> {
 
 			top_left.x = Math.min(top_left.x, x);
 			top_left.y = Math.min(top_left.y, y);
-		}
+		}*/
 
 		// Rotate Rect's center points originied on avg_center by (avg_rot - 90)
-
+/*
 		let rotated = squares.map(
 			x => new cv.Point(x[0].center.x, x[0].center.y)
 		);
 		rotate_points(avg_rot, avg_center, rotated);
-		// We found and corrected the rotation of every facelet, now we sort them
 
-		// loop over all centers
-		/*	const RANGE = 100;
-		for (const a of points) {
-			for (const b of points) {
-				if ((a.x - b.x) >= -RANGE && (a.x - b.x) <= RANGE) {
-					const i = rows.length;
 
-					if (!rows[i]) {
-						rows[i] = [];
-					}
+		// Row match, sort row L - R, Sort all rows T - B
+		const RANGE = 40;
+		const sorted: [cv.Point, number][][] = [];
+		for (const a of rotated) {
+		   const row: [cv.Point, number][] = [];
 
-					rows[i].push(b);
+		   const max = a.y + RANGE;
+		   const min = a.y - RANGE;
+
+		   for (let i = 0; i < squares.length; i++) {
+				const b = rotated[i];
+				if (b.y <= max && b.y >= min) {
+				    row.push([b, i]);
 				}
-			}
+		   } 
+
+		   // Left to right
+		   row.sort((a, b) => a[0].x - b[0].x);
+
+		   sorted.push(row);
 		}
 
-		console.log(rows);*/
-		// find ones with similar Y's ( -10 to 10 px difference )
-		// Sort all L to R
-		// Sort rows T to B
-		//
-		// dont do the below
-		/*
+		// Top to bottom
+		sorted.sort((a, b) => a[0][0].y - b[0][0].y);
 		
-		// Align centers to a grid. Average the Y and X distance between all colors. Move closest Rect into every grid cell.
-		// sort the grid cells TBLR ( rank_TBLR )
-		// Get back the original rects, but sorted
+		const flat_sorted = sorted.flat();
+		console.log(flat_sorted);
 
-		const rot_m2 = cv.getRotationMatrix2D(avg_center, avg_rot, 1);
-		const rotated = new cv.Mat();
-		cv.warpAffine(frame, rotated, rot_m2, new cv.Size(frame.cols, frame.rows));
-		cv.imshow("TEST", rotated);
-		rotated.delete();
-		rot_m2.delete();*/
-
-		// [Rect -> Image -> Average -> HSV -> FaceletColor]
+		for (let i = 0; i < squares.length; i++) {
+		    const to = flat_sorted[i][1];
+		
+			squares[i] = squares[to];
+		}
+*/
+		// Rect -> Image -> Average -> HSV -> FaceletColor
 
 		const facelets: FaceletColor[] = Array.from({ length: 9 });
 		for (let i = 0; i < squares.length; i++) {
@@ -331,14 +330,12 @@ export function scan_cube(frame: cv.Mat): false | Partial<Cube> {
 			cropped.delete();
 
 			cv.cvtColor(average, average, cv.COLOR_RGB2HSV);
-			//console.log([...average.data]);
 
 			const facelet = hsv_to_facelet(average.data);
-			//console.log(facelet);
 			average.delete();
 
 			if (facelet === null) {
-				return false; // At least one square could not be found, do not pollute cube with nulls;
+				return false; // At least one square could not be found
 			}
 
 			facelets[i] = facelet;

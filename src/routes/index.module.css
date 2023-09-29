@@ -1,0 +1,7 @@
+.option_icon_container {
+    @apply bg-[length:25px_25px] h-24 flex items-center justify-center bg-[radial-gradient(hsl(var(--accent))_1px,transparent_1px)];
+}
+
+.option {
+    @apply flex flex-col transition-colors hover:border-primary;
+}

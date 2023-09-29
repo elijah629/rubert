@@ -1,15 +1,30 @@
 import CubeNet from "@/components/CubeNet";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Cube, PartialCube, FaceletColor, facelet_color } from "@/lib/cube";
-import { createSignal, For, onMount } from "solid-js";
+import { PartialCube, FaceletColor } from "@/lib/cube";
+import { createEffect, createSignal, on, onMount } from "solid-js";
 import { scan_cube } from "@/lib/scanning";
 import SolveButton from "@/components/SolveButton";
 import ColorPicker from "@/components/ColorPicker";
+import { useIsRouting } from "solid-start";
 
 export default function Scan() {
 	let canvas!: HTMLCanvasElement;
 	let video!: HTMLVideoElement;
+
+    const isRouting = useIsRouting();
+
+		createEffect(on(isRouting, () => {
+		    const stream = video.srcObject as MediaStream | null;
+		    const tracks = stream?.getTracks();
+				
+		    if (!tracks) {
+				return;
+			}
+
+			for (const track of tracks) {
+	    		track.stop();
+			}
+		}));
 
 	const [cube, setCube] = createSignal<PartialCube>({}, { equals: false });
 	const [color, setColor] = createSignal<FaceletColor | null>(null);
@@ -40,6 +55,7 @@ export default function Scan() {
 				height: { ideal: RES }
 			}
 		});
+
 		video.srcObject = media;
 
 		video.addEventListener("canplay", () => {
@@ -86,10 +102,10 @@ export default function Scan() {
 			<script
 				type="text/javascript"
 				src="/js/opencv.js"></script>
-			<Card class="flex flex-col justify-between p-4 sm:h-80 sm:flex-row">
+			<Card class="flex flex-col justify-between p-4 mb-4 sm:h-80 sm:flex-row">
 				<canvas
 					ref={canvas}
-					class="h-full w-auto rounded-md border-2"></canvas>
+					class="w-auto rounded-md border-2"></canvas>
 				<video
 					id="wci"
 					class="h-full w-auto rounded-md border-2"
