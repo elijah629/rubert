@@ -19,7 +19,7 @@ pub fn solve(facelets: &[u8]) -> Result<Uint8ClampedArray, Error> {
     let state = State::try_from(&cube)?;
     let pruning_table = PruningTable::default();
     let move_table = MoveTable::default();
-    let mut solver = Solver::new(&move_table, &pruning_table, GODS_NUMBER);
+    let mut solver = Solver::new(&move_table, &pruning_table, GODS_NUMBER + 3); // adding so we dont search for too long
     let solution = solver.solve(state).ok_or(Error::NoSolution)?;
 
     // Serialize the solution into bytes to send to JS
