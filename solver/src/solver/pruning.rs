@@ -58,4 +58,3 @@ pub fn get_prune_table(table1: Table<u16>, table2: Table<u16>, moves: &[Move]) -
 
     pruning_table
 }
-

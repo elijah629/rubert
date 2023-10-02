@@ -1,4 +1,4 @@
-use super::{facelet::Color, state::State};
+use super::state::State;
 use core::ops::Add;
 use std::fmt;
 
@@ -313,7 +313,7 @@ impl Algorithim {
             }
         }
 
-        Self(simplified.iter().flatten().map(|&x| x).collect())
+        Self(simplified.iter().flatten().copied().collect())
         // Self(
         //     self.0
         //         .iter()
@@ -352,9 +352,9 @@ impl From<Vec<Move>> for Algorithim {
     }
 }
 
-impl Into<Box<[u8]>> for Algorithim {
-    fn into(self) -> Box<[u8]> {
-        self.0
+impl From<Algorithim> for Box<[u8]> {
+    fn from(val: Algorithim) -> Self {
+        val.0
             .into_iter()
             .map(|x| match x {
                 Move::U => 0,

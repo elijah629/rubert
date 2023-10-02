@@ -7,7 +7,7 @@ use crate::solver::utils::GODS_NUMBER;
 use cube::{facelet::Cube, state::State};
 use error::Error;
 use js_sys::Uint8ClampedArray;
-use solver::{moves::MoveTable, pruning::PruningTable, solver::Solver};
+use solver::{moves::MoveTable, pruning::PruningTable, Solver};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

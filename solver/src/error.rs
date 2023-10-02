@@ -28,8 +28,8 @@ impl fmt::Display for Error {
     }
 }
 
-impl Into<JsValue> for Error {
-    fn into(self) -> JsValue {
-        self.to_string().into()
+impl From<Error> for JsValue {
+    fn from(val: Error) -> Self {
+        val.to_string().into()
     }
 }

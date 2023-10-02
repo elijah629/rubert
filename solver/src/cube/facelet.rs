@@ -55,7 +55,7 @@ impl TryFrom<&[u8]> for Cube {
             return Err(Error::TooManySame);
         }
 
-        for (i, &c) in facelets.into_iter().enumerate() {
+        for (i, &c) in facelets.iter().enumerate() {
             cube.facelets[i] = Color::try_from(c)?;
         }
 
