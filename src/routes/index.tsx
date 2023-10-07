@@ -165,7 +165,7 @@ export default function Timer() {
 							<SheetHeader>
 								<SheetTitle>Sessions</SheetTitle>
 								<SheetDescription>
-									<div class="flex gap-2">
+									<div class="flex flex-wrap gap-2">
 										<Select
 											value={session()}
 											onChange={setSession}
