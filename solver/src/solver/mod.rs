@@ -122,6 +122,7 @@ pub struct Solver<'a> {
     best_solution: Option<Algorithim>,
 }
 
+// inspired from https://www.jaapsch.net/puzzles/compcube.htm#kocal and the kewb crate
 impl<'a> Solver<'a> {
     pub fn new(move_table: &'a MoveTable, pruning_table: &'a PruningTable, max_length: u8) -> Self {
         Self {
@@ -203,19 +204,15 @@ impl<'a> Solver<'a> {
 
     fn solve_phase2(&mut self, state: Phase2, depth: u8) -> bool {
         if depth == 0 && state.is_solved() {
-            let solution: Algorithim = [
-                self.solution_phase1.as_slice(),
-                self.solution_phase2.as_slice(),
-            ]
-            .concat()
-            .into();
+            let mut solution = self.solution_phase1.clone();
+            solution.extend(self.solution_phase2.as_slice());
 
             if let Some(best_solution) = &mut self.best_solution {
                 if best_solution.len() > solution.len() {
-                    *best_solution = solution
+                    *best_solution = solution.into()
                 }
             } else {
-                self.best_solution = Some(solution)
+                self.best_solution = Some(solution.into())
             }
 
             return true;

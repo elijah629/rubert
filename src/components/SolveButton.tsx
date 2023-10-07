@@ -9,7 +9,7 @@ export default function SolveButton(props: { cube: PartialCube }) {
 					.wasm_facelets()
 					.join("");
 				window
-					.open(`${window.origin}/solve/${cube_string}`, "_blank")
+					.open(`${window.origin}/solver/${cube_string}`, "_blank")
 					?.focus();
 			}}>
 			Solve

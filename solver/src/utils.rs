@@ -1,5 +1,5 @@
-// use core::fmt;
-// use wasm_bindgen::prelude::*;
+use core::fmt;
+use wasm_bindgen::prelude::*;
 
 pub fn set_panic_hook() {
     // When the `console_error_panic_hook` feature is enabled, we can call the
@@ -12,21 +12,21 @@ pub fn set_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
-// #[wasm_bindgen]
-// extern "C" {
-//     #[wasm_bindgen(js_namespace = console)]
-//     fn log(s: &str);
-// }
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
 
-// #[doc(hidden)]
-// pub fn _printjs_args(args: fmt::Arguments) {
-//     log(&args.to_string());
-// }
+#[doc(hidden)]
+pub fn _printjs_args(args: fmt::Arguments) {
+    log(&args.to_string());
+}
 
-// #[macro_export]
-// macro_rules! printjs {
-//     () => { printjs!("\n"); };
-//     ($($arg:tt)*) => {{
-//         $crate::utils::_printjs_args(format_args!($($arg)*));
-//     }};
-// }
+#[macro_export]
+macro_rules! printjs {
+    () => { printjs!("\n"); };
+    ($($arg:tt)*) => {
+        $crate::utils::_printjs_args(format_args!($($arg)*));
+    };
+}

@@ -10,6 +10,7 @@ use super::{
 
 /// Represents the 8 corners on the cube, described by the layer they are on.
 #[rustfmt::skip]
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub enum Corner {
     UBL, UBR, UFR, UFL,
@@ -253,7 +254,7 @@ impl TryFrom<&Cube> for State {
 
 pub const SOLVED_STATE: State = State {
     cp: [UBL, UBR, UFR, UFL, DFL, DFR, DBR, DBL],
-    co: [0, 0, 0, 0, 0, 0, 0, 0],
+    co: [0; 8],
     ep: [BL, BR, FR, FL, UB, UR, UF, UL, DF, DR, DB, DL],
-    eo: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    eo: [0; 12],
 };

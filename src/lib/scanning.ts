@@ -225,7 +225,7 @@ export function scan_cube(frame: cv.Mat): false | Partial<Cube> {
 
 	if (squares.length === 9) {
 		// Find avg_rot and avg_center
-	/*	const avg_rot =
+		/*	const avg_rot =
 			squares.map(x => x[0].angle - 90).reduce((a, b) => a + b) / 9;
 		const acc_center = squares
 			.map(x => x[0].center)
@@ -243,7 +243,7 @@ export function scan_cube(frame: cv.Mat): false | Partial<Cube> {
 		}*/
 
 		// Rotate Rect's center points originied on avg_center by (avg_rot - 90)
-/*
+		/*
 		let rotated = squares.map(
 			x => new cv.Point(x[0].center.x, x[0].center.y)
 		);

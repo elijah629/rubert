@@ -19,15 +19,15 @@ pub struct PruningTable {
 impl Default for PruningTable {
     fn default() -> Self {
         Self {
-            co_e: get_prune_table(get_co_table(), get_e_combo_table(), &MOVES),
-            eo_e: get_prune_table(get_eo_table(), get_e_combo_table(), &MOVES),
-            cp_e: get_prune_table(get_cp_table(), get_e_ep_table(), &PHASE2_MOVES),
-            ep_e: get_prune_table(get_ud_ep_table(), get_e_ep_table(), &PHASE2_MOVES),
+            co_e: get_prune_table(get_co_table(), get_e_combo_table(), MOVES.len()),
+            eo_e: get_prune_table(get_eo_table(), get_e_combo_table(), MOVES.len()),
+            cp_e: get_prune_table(get_cp_table(), get_e_ep_table(), PHASE2_MOVES.len()),
+            ep_e: get_prune_table(get_ud_ep_table(), get_e_ep_table(), PHASE2_MOVES.len()),
         }
     }
 }
 
-pub fn get_prune_table(table1: Table<u16>, table2: Table<u16>, moves: &[Move]) -> Table<u8> {
+pub fn get_prune_table(table1: Table<u16>, table2: Table<u16>, n_moves: usize) -> Table<u8> {
     let len1 = table1.len();
     let len2 = table2.len();
     let fill_size = len1 * len2;
@@ -39,11 +39,11 @@ pub fn get_prune_table(table1: Table<u16>, table2: Table<u16>, moves: &[Move]) -
 
     while filled != fill_size {
         for i in 0..len1 {
-            for j in 0..len2 {
+            for (j, t2_j) in table2.iter().enumerate() {
                 if pruning_table[i][j] == distance {
-                    for m in 0..moves.len() {
+                    for (m, &t2_jm) in t2_j.iter().enumerate().take(n_moves) {
                         let next1 = table1[i][m] as usize;
-                        let next2 = table2[j][m] as usize;
+                        let next2 = t2_jm as usize;
                         if pruning_table[next1][next2] == 255 {
                             pruning_table[next1][next2] = distance + 1;
                             filled += 1;

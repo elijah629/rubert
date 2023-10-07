@@ -19,7 +19,7 @@ export default function Root() {
 	return (
 		<Html lang="en">
 			<Head>
-				<Title>Rubert - The fastest rubiks cube solver</Title>
+				<Title>Rubert - The fastest 3x3x3 Rubik's cube solver and timer</Title>
 				<Link
 					rel="icon"
 					href="favicon.ico"

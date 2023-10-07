@@ -30,7 +30,7 @@ pub struct Cube {
 }
 
 #[rustfmt::skip]
-const IDENTITY_CUBE: Cube = Cube {
+pub const IDENTITY_CUBE: Cube = Cube {
     facelets: [
         Color::U, Color::U, Color::U, Color::U, Color::U, Color::U, Color::U, Color::U, Color::U,
         Color::R, Color::R, Color::R, Color::R, Color::R, Color::R, Color::R, Color::R, Color::R,
@@ -44,8 +44,6 @@ const IDENTITY_CUBE: Cube = Cube {
 impl TryFrom<&[u8]> for Cube {
     type Error = Error;
     fn try_from(facelets: &[u8]) -> Result<Self, Self::Error> {
-        let mut cube = IDENTITY_CUBE;
-
         let mut counts: HashMap<u8, usize> = HashMap::new();
         for &x in facelets {
             *counts.entry(x).or_default() += 1;
@@ -54,6 +52,8 @@ impl TryFrom<&[u8]> for Cube {
         if counts.values().any(|&x| x != 9) {
             return Err(Error::TooManySame);
         }
+
+        let mut cube = IDENTITY_CUBE;
 
         for (i, &c) in facelets.iter().enumerate() {
             cube.facelets[i] = Color::try_from(c)?;

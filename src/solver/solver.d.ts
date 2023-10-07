@@ -5,16 +5,23 @@
 * @returns {Uint8ClampedArray}
 */
 export function solve(facelets: Uint8Array): Uint8ClampedArray;
+/**
+* @param {number} length
+* @returns {Uint8ClampedArray}
+*/
+export function generate_scramble(length: number): Uint8ClampedArray;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly solve: (a: number, b: number, c: number) => void;
+  readonly generate_scramble: (a: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_exn_store: (a: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
