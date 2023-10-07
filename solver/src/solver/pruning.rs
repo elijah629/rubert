@@ -1,5 +1,3 @@
-use crate::cube::moves::Move;
-
 use super::{
     moves::{
         get_co_table, get_cp_table, get_e_combo_table, get_e_ep_table, get_eo_table,
