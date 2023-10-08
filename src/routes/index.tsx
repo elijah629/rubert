@@ -410,6 +410,7 @@ export default function Timer() {
 								{format_stopwatch(
 									sessions()
 										[session()!].solves.map(x => x.time)
+										.sort().filter((_, i, a) => i !== 0 && i !== a.length - 1)
 										.reduce((a, b) => a + b) /
 										sessions()[session()!].solves.length
 								)}{" "}
