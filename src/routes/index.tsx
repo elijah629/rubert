@@ -404,7 +404,7 @@ export default function Timer() {
 						<Show
 							when={
 								session() &&
-								sessions()[session()!].solves.length != 0
+								sessions()[session()!].solves.length > 2
 							}>
 							<span class="text-muted">
 								{format_stopwatch(
