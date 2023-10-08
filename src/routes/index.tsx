@@ -241,9 +241,6 @@ export default function Timer() {
 												}>
 												{(solve, i) => (
 													<TableRow>
-														<TableCell class="font-medium">
-															#{i() + 1}
-														</TableCell>
 														<TableCell>
 															<Show
 																when={
@@ -310,17 +307,14 @@ export default function Timer() {
 																		sessions => {
 																			const current =
 																				sessions[
-																					session()!
-																				]
-																					.solves[
-																					i()
-																				];
-
-																			current.plus_2 =
-																				!current.plus_2;
-																			return structuredClone(
-																				sessions
+																				session()!
+																			];
+																			current.solves.splice(
+																				i(),
+																				1,
+																				{ ...solve, plus_2: !solve.plus_2 }
 																			);
+																			return sessions;
 																		}
 																	);
 																}}
@@ -335,17 +329,15 @@ export default function Timer() {
 																		sessions => {
 																			const current =
 																				sessions[
-																					session()!
-																				]
-																					.solves[
-																					i()
-																				];
-
-																			current.dnf =
-																				!current.dnf;
-																			return structuredClone(
-																				sessions
+																				session()!
+																			];
+																			current.solves.splice(
+																				i(),
+																				1,
+																				{ ...solve, dnf: !solve.dnf }
 																			);
+																			return sessions;
+
 																		}
 																	);
 																}}
@@ -379,7 +371,8 @@ export default function Timer() {
 			</Card>
 
 			<div
-				class="flex flex-1 items-center justify-center"
+				class="flex flex-1 items-center justify-center outline-none"
+				tabindex="0"
 				onKeyDown={e => {
 					if (e.key === " ") {
 						timer_toggle();
