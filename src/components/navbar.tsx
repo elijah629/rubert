@@ -11,6 +11,7 @@ export default function Navbar() {
 						href="/"
 						class="mr-6 flex items-center font-bold">
 						<img
+							alt=""
 							src="/icon.png"
 							class="inline h-10 w-10 p-2"></img>
 						Rubert
@@ -30,9 +31,9 @@ export default function Navbar() {
 							<Button
 								variant="ghost"
 								size="sm"
+								aria-label="GitHub"
 								class="w-9 px-0">
 								<TbBrandGithub size={24} />
-								<span class="sr-only">GitHub</span>
 							</Button>
 						</a>
 					</div>

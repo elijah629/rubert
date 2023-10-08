@@ -18,10 +18,20 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import {
+	TbExposurePlus2,
 	TbFreezeColumn,
 	TbRefresh,
 	TbX
 } from "solid-icons/tb";
+import {
+	Table,
+	TableBody,
+	TableCaption,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow
+} from "@/components/ui/table";
 import init, { generate_scramble } from "@/solver/solver";
 import Move from "@/components/Move";
 import { As } from "@kobalte/core";
@@ -31,6 +41,8 @@ import DeleteSessionButton from "@/components/DeleteSessionButton";
 
 interface Solve {
 	time: number;
+	dnf: boolean;
+	plus_2: boolean;
 	scramble: CMove[];
 }
 
@@ -48,11 +60,14 @@ function format_stopwatch(ms: number): string {
 }
 
 export default function Timer() {
-	const [sessions, setSessions] = createSignal<Record<string, Session>>({});
+	const [sessions, setSessions] = createSignal<Record<string, Session>>(
+		{},
+		{ equals: false }
+	);
 	const [session, setSession] = createSignal<string>();
 	const [scramble, setScramble] = createSignal<CMove[]>();
 	const [elapsed, setElapsed] = createSignal<number>();
-	const [started, setStarted] = createSignal<boolean>(false);
+	const [running, setStarted] = createSignal<boolean>(false);
 
 	let start_time = null;
 	const newScramble = async () => {
@@ -65,7 +80,7 @@ export default function Timer() {
 		const elapsed = Date.now() - start_time!;
 		setElapsed(elapsed);
 
-		if (started()) {
+		if (running()) {
 			window.requestAnimationFrame(update_timer);
 		}
 	};
@@ -73,42 +88,36 @@ export default function Timer() {
 	onMount(newScramble);
 
 	const timer_toggle = () => {
-	    if (!session()) {
+		if (!session()) {
 			return;
 		}
-		setStarted(!started());
-		if (started()) {
+		setStarted(!running());
+		if (running()) {
 			window.requestAnimationFrame(update_timer);
 			start_time = Date.now();
 		} else {
 			setSessions(sessions => {
-				const ses = { ...sessions };
-				const current = ses[session()!];
+				const current = sessions[session()!];
 				current.solves.push({
 					time: elapsed()!,
-					scramble: scramble()!
+					scramble: scramble()!,
+					dnf: false,
+					plus_2: false
 				});
-				return ses;
+
+				newScramble();
+				return sessions;
 			});
 		}
 	};
 
-	onMount(() => {
-		window.addEventListener("keydown", e => {
-			if (e.key === " ") {
-				timer_toggle();
-			}
-		});
-	});
-
+	// onMount can't work because we would need to put a createEffect inside of an onMount and that disables destruction
 	if (typeof window !== "undefined") {
 		let can_update = false;
 
 		const db = idb.openDB("timer-db", 1, {
 			upgrade(db) {
-				db.createObjectStore(
-					"sessions" /*, { keyPath: "name", autoIncrement: true }*/
-				);
+				db.createObjectStore("sessions");
 			}
 		});
 
@@ -165,104 +174,218 @@ export default function Timer() {
 							<SheetHeader>
 								<SheetTitle>Sessions</SheetTitle>
 								<SheetDescription>
-									<div class="flex flex-wrap gap-2">
-										<Select
-											value={session()}
-											onChange={setSession}
-											options={Object.keys(sessions())}
-											placeholder="Select a session…"
-											itemComponent={props => (
-												<SelectItem item={props.item}>
-													{props.item.rawValue}
-												</SelectItem>
-											)}>
-											<SelectTrigger
-												aria-label="Session"
-												class="w-[180px]">
-												<SelectValue<string>>
-													{state =>
-														state.selectedOption()
-													}
-												</SelectValue>
-											</SelectTrigger>
-											<SelectContent />
-										</Select>
-										<NewSessionButton
-											onCreate={x => {
-												setSessions(sessions => ({
-													...sessions,
-													[x]: { solves: [] }
-												}));
-												setSession(x);
-											}}
-										/>
-										<DeleteSessionButton has_session={!!session()} onDelete={() => { setSessions(sessions => { const s = {...sessions}; delete s[session()!]; setSession(undefined); return s; }) }}/>
-									</div>
-									<Show when={session()}>
-										<div class="m-2 flex max-h-[calc(100vh-200px)] flex-col overflow-auto">
+									Manage your sessions
+								</SheetDescription>
+							</SheetHeader>
+							<div class="mt-2 flex flex-wrap gap-2">
+								<Select
+									value={session()}
+									onChange={setSession}
+									options={Object.keys(sessions())}
+									placeholder="Select a session…"
+									itemComponent={props => (
+										<SelectItem item={props.item}>
+											{props.item.rawValue}
+										</SelectItem>
+									)}>
+									<SelectTrigger
+										aria-label="Session"
+										class="w-[180px]">
+										<SelectValue<string>>
+											{state => state.selectedOption()}
+										</SelectValue>
+									</SelectTrigger>
+									<SelectContent />
+								</Select>
+								<NewSessionButton
+									onCreate={x => {
+										setSessions({
+											...sessions(),
+											[x]: { solves: [] }
+										});
+										setSession(x);
+									}}
+								/>
+								<DeleteSessionButton
+									has_session={!!session()}
+									onDelete={() => {
+										setSessions(sessions => {
+											delete sessions[session()!];
+											setSession(undefined);
+											return sessions;
+										});
+									}}
+								/>
+							</div>
+							<Show when={session()}>
+								<div class="mt-2 max-h-[calc(100vh-200px)]">
+									<Table>
+										<TableCaption>
+											A list of your solves for this
+											session.
+										</TableCaption>
+										<TableHeader>
+											<TableRow>
+												<TableHead>Time</TableHead>
+												<TableHead>Scramble</TableHead>
+												<TableHead class="text-right">
+													Actions
+												</TableHead>
+											</TableRow>
+										</TableHeader>
+										<TableBody>
 											<For
 												each={
 													sessions()[session()!]
 														.solves
 												}>
 												{(solve, i) => (
-													<span class="flex gap-1 rounded-sm p-2 hover:bg-muted hover:text-muted-foreground">
-														<Button
-															onClick={() => {
-																setSessions(
-																	sessions => {
-																		const ses =
-																			{
-																				...sessions
-																			};
-																		const current =
-																			ses[
-																				session()!
-																			];
-																		current.solves.splice(
-																			i(),
-																			1
-																		);
-																		return ses;
+													<TableRow>
+														<TableCell class="font-medium">
+															#{i() + 1}
+														</TableCell>
+														<TableCell>
+															<Show
+																when={
+																	!solve.dnf
+																}
+																fallback={
+																	<>DNF</>
+																}>
+																<Show
+																	when={
+																		solve.plus_2
 																	}
-																);
-															}}
-															variant="destructive"
-															size="sm"
-															class="h-5 w-5 px-0">
-															<TbX size={16} />
-														</Button>
-														#{i() + 1}
-														<strong>
-															{format_stopwatch(
-																solve.time
-															)}
-														</strong>
-														{solve.scramble
-															.map(x => CMove[x])
-															.join(" ")}
-													</span>
+																	fallback={
+																		<>
+																			{format_stopwatch(
+																				solve.time
+																			)}
+																		</>
+																	}>
+																	{format_stopwatch(
+																		solve.time +
+																			2000
+																	)}
+																	+
+																</Show>
+															</Show>
+														</TableCell>
+														<TableCell>
+															{solve.scramble
+																.map(
+																	x =>
+																		CMove[x]
+																)
+																.join(" ")}
+														</TableCell>
+														<TableCell class="flex flex-col gap-2 sm:flex-row">
+															<Button
+																aria-label="Delete solve"
+																onClick={() => {
+																	setSessions(
+																		sessions => {
+																			const current =
+																				sessions[
+																					session()!
+																				];
+																			current.solves.splice(
+																				i(),
+																				1
+																			);
+																			return sessions;
+																		}
+																	);
+																}}
+																variant="destructive"
+																size="sm">
+																<TbX
+																	size={16}
+																/>
+															</Button>
+															<Button
+																aria-label="Plus 2 Solve"
+																onClick={() => {
+																	setSessions(
+																		sessions => {
+																			const current =
+																				sessions[
+																					session()!
+																				]
+																					.solves[
+																					i()
+																				];
+
+																			current.plus_2 =
+																				!current.plus_2;
+																			return structuredClone(
+																				sessions
+																			);
+																		}
+																	);
+																}}
+																size="sm">
+																<TbExposurePlus2
+																	size={16}
+																/>
+															</Button>
+															<Button
+																onClick={() => {
+																	setSessions(
+																		sessions => {
+																			const current =
+																				sessions[
+																					session()!
+																				]
+																					.solves[
+																					i()
+																				];
+
+																			current.dnf =
+																				!current.dnf;
+																			return structuredClone(
+																				sessions
+																			);
+																		}
+																	);
+																}}
+																size="sm">
+																DNF
+															</Button>
+														</TableCell>
+													</TableRow>
 												)}
 											</For>
-										</div>
-									</Show>
-								</SheetDescription>
-							</SheetHeader>
+										</TableBody>
+									</Table>
+								</div>
+							</Show>
 						</SheetContent>
 					</Sheet>
 					<Button
+						aria-label="Generate new scramble"
 						size="sm"
 						variant="secondary"
 						onClick={newScramble}>
 						<TbRefresh size={24} />
 					</Button>
 				</div>
-				<div class="flex gap-2 overflow-auto p-2 [&>*]:w-14">
+				<div
+					class={`flex gap-2 overflow-auto p-2 [&>*]:w-14 transition${
+						running() ? " blur grayscale" : ""
+					}`}>
 					<For each={scramble()}>{x => <Move move={x} />}</For>
 				</div>
 			</Card>
 
-			<div class="flex flex-1 items-center justify-center">
+			<div
+				class="flex flex-1 items-center justify-center"
+				onKeyDown={e => {
+					if (e.key === " ") {
+						timer_toggle();
+					}
+				}}
+				onClick={() => timer_toggle()}>
 				<Show
 					when={session()}
 					fallback={
@@ -270,11 +393,7 @@ export default function Timer() {
 							Please select or create a session.
 						</span>
 					}>
-					<div
-						class="flex flex-col items-center gap-2"
-						onClick={() => {
-							timer_toggle();
-						}}>
+					<div class="flex flex-col items-center gap-2">
 						<Show when={elapsed()}>
 							<span class="font-mono text-5xl font-bold">
 								{format_stopwatch(elapsed()!)}
@@ -283,7 +402,7 @@ export default function Timer() {
 						<span class="text-muted">
 							Presss space bar, tap or click to{" "}
 							<Show
-								when={!started()}
+								when={!running()}
 								fallback={<>stop</>}>
 								start
 							</Show>

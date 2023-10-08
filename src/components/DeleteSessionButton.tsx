@@ -13,7 +13,7 @@ import { TbTrash } from "solid-icons/tb";
 import { createSignal } from "solid-js";
 
 export default function DeleteSessionButton(props: {
-    has_session: boolean;
+	has_session: boolean;
 	onDelete: () => void;
 }) {
 	const [open, setOpen] = createSignal<boolean>(false);
@@ -23,24 +23,26 @@ export default function DeleteSessionButton(props: {
 			open={open()}
 			onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-			<As component={Button}
-				disabled={!props.has_session}
-											variant="destructive"
-											class="gap-2">
-											Delete
-											<TbTrash size={20} /></As>
-
+				<As
+					component={Button}
+					disabled={!props.has_session}
+					variant="destructive"
+					class="gap-2">
+					Delete
+					<TbTrash size={20} />
+				</As>
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Are you sure?</DialogTitle>
 					<DialogDescription>
-						This will irreversably delete every solve under this session.
+						This will irreversably delete every solve under this
+						session.
 					</DialogDescription>
 
 					<DialogFooter>
 						<Button
-						    variant="destructive"
+							variant="destructive"
 							onClick={() => {
 								setOpen(false);
 								props.onDelete();

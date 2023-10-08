@@ -47,6 +47,7 @@ export default function NewSessionButton(props: {
 								Name
 							</Label>
 							<Input
+								id="name"
 								class="col-span-3"
 								ref={name_feild}
 							/>

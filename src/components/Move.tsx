@@ -22,6 +22,10 @@ import B3 from "@/icons/B3.svg";
 export default function Move(props: { move: CMove }) {
 	return (
 		<img
+			alt={CMove[props.move]
+				.replace("1", "")
+				.replace("2", " two")
+				.replace("3", " prime")}
 			src={
 				[
 					U1,

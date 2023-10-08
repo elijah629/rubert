@@ -13,7 +13,7 @@ function OptionCard(props: {href: string, icon: IconTypes, title: string, descri
 						    <props.icon size={80}/>
 						</div>
 						<div class="border-t-2 p-5">
-							<h3 class="text-2xl font-black">{props.title}</h3>
+							<span class="text-2xl font-black">{props.title}</span>
 							<p class="text-sm text-muted-foreground">
 								{props.description}
 							</p>

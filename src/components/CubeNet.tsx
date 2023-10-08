@@ -26,6 +26,9 @@ export default function CubeNet(props: {
 						const [h, s, l] = facelet_color[x as any];
 						return props.onClick ? (
 							<button
+								aria-label={`Face ${
+									FaceletColor[fprops.face]
+								}, Color: ${FaceletColor[x!]}`}
 								onClick={() => {
 									props.onClick?.(fprops.face, i());
 								}}
