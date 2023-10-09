@@ -404,13 +404,12 @@ export default function Timer() {
 						<Show
 							when={
 								session() &&
-								sessions()[session()!].solves.length > 2
+								sessions()[session()!].solves.length != 0
 							}>
 							<span class="text-muted">
 								{format_stopwatch(
 									sessions()
 										[session()!].solves.map(x => x.time)
-										.sort().filter((_, i, a) => i !== 0 && i !== a.length - 1)
 										.reduce((a, b) => a + b) /
 										sessions()[session()!].solves.length
 								)}{" "}
