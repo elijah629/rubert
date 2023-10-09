@@ -32,7 +32,7 @@ export default function Navbar() {
 								variant="ghost"
 								size="sm"
 								aria-label="GitHub"
-								class="w-9 px-0">
+								class="h-10 w-10 p-0">
 								<TbBrandGithub size={24} />
 							</Button>
 						</a>

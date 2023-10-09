@@ -18,10 +18,9 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import {
-	TbExposurePlus2,
+	TbDots,
 	TbFreezeColumn,
 	TbRefresh,
-	TbX
 } from "solid-icons/tb";
 import {
 	Table,
@@ -38,6 +37,17 @@ import { As } from "@kobalte/core";
 import { Card } from "@/components/ui/card";
 import NewSessionButton from "@/components/NewSessionButton";
 import DeleteSessionButton from "@/components/DeleteSessionButton";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroupLabel,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+	DropdownMenuRadioItem,
+	DropdownMenuRadioGroup
+} from "@/components/ui/dropdown-menu";
 
 interface Solve {
 	time: number;
@@ -219,137 +229,7 @@ export default function Timer() {
 							</div>
 							<Show when={session()}>
 								<div class="mt-2 max-h-[calc(100vh-200px)]">
-									<Table>
-										<TableCaption>
-											A list of your solves for this
-											session.
-										</TableCaption>
-										<TableHeader>
-											<TableRow>
-												<TableHead>Time</TableHead>
-												<TableHead>Scramble</TableHead>
-												<TableHead class="text-right">
-													Actions
-												</TableHead>
-											</TableRow>
-										</TableHeader>
-										<TableBody>
-											<For
-												each={
-													sessions()[session()!]
-														.solves
-												}>
-												{(solve, i) => (
-													<TableRow>
-														<TableCell>
-															<Show
-																when={
-																	!solve.dnf
-																}
-																fallback={
-																	<>DNF</>
-																}>
-																<Show
-																	when={
-																		solve.plus_2
-																	}
-																	fallback={
-																		<>
-																			{format_stopwatch(
-																				solve.time
-																			)}
-																		</>
-																	}>
-																	{format_stopwatch(
-																		solve.time +
-																			2000
-																	)}
-																	+
-																</Show>
-															</Show>
-														</TableCell>
-														<TableCell>
-															{solve.scramble
-																.map(
-																	x =>
-																		CMove[x]
-																)
-																.join(" ")}
-														</TableCell>
-														<TableCell class="flex flex-col gap-2 sm:flex-row">
-															<Button
-																aria-label="Delete solve"
-																onClick={() => {
-																	setSessions(
-																		sessions => {
-																			const current =
-																				sessions[
-																					session()!
-																				];
-																			current.solves.splice(
-																				i(),
-																				1
-																			);
-																			return sessions;
-																		}
-																	);
-																}}
-																variant="destructive"
-																size="sm">
-																<TbX
-																	size={16}
-																/>
-															</Button>
-															<Button
-																aria-label="Plus 2 Solve"
-																onClick={() => {
-																	setSessions(
-																		sessions => {
-																			const current =
-																				sessions[
-																				session()!
-																			];
-																			current.solves.splice(
-																				i(),
-																				1,
-																				{ ...solve, plus_2: !solve.plus_2 }
-																			);
-																			return sessions;
-																		}
-																	);
-																}}
-																size="sm">
-																<TbExposurePlus2
-																	size={16}
-																/>
-															</Button>
-															<Button
-																onClick={() => {
-																	setSessions(
-																		sessions => {
-																			const current =
-																				sessions[
-																				session()!
-																			];
-																			current.solves.splice(
-																				i(),
-																				1,
-																				{ ...solve, dnf: !solve.dnf }
-																			);
-																			return sessions;
-
-																		}
-																	);
-																}}
-																size="sm">
-																DNF
-															</Button>
-														</TableCell>
-													</TableRow>
-												)}
-											</For>
-										</TableBody>
-									</Table>
+									<SolveTable />
 								</div>
 							</Show>
 						</SheetContent>
@@ -421,4 +301,129 @@ export default function Timer() {
 			</div>
 		</div>
 	);
+
+	function SolveTable() {
+		return (
+			<Table>
+				<TableCaption>
+					A list of your solves for this session.
+				</TableCaption>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Time</TableHead>
+						<TableHead>Scramble</TableHead>
+						<th/>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					<For each={sessions()[session()!].solves}>
+						{(solve, i) => (
+							<Solve
+								solve={solve}
+								i={i}
+							/>
+						)}
+					</For>
+				</TableBody>
+			</Table>
+		);
+	}
+
+	function Solve(props: { solve: Solve; i: () => number }) {
+		return (
+			<TableRow>
+				<TableCell>
+					<Show
+						when={!props.solve.dnf}
+						fallback={<>DNF</>}>
+						<Show
+							when={props.solve.plus_2}
+							fallback={
+								<>{format_stopwatch(props.solve.time)}</>
+							}>
+							{format_stopwatch(props.solve.time + 2000)}+
+						</Show>
+					</Show>
+				</TableCell>
+				<TableCell>
+					{props.solve.scramble
+						.map(x => CMove[x].replace("3", "'").replace("1", ""))
+						.join(" ")}
+				</TableCell>
+				<TableCell class="flex flex-col gap-2 sm:flex-row">
+					<SolveMenu
+						solve={ props.solve}
+						delete={() => {
+							setSessions(sessions => {
+								const current = sessions[session()!];
+								current.solves.splice(props.i(), 1);
+								return sessions;
+							});
+						}}
+						penalty={(dnf, plus_2) => {
+							setSessions(sessions => {
+								const current = sessions[session()!];
+								current.solves.splice(props.i(), 1, {
+									...props.solve,
+									dnf,
+									plus_2
+								});
+								return sessions;
+							});
+						}}
+						use_scramble={() => setScramble(props.solve.scramble)}
+					/>
+				</TableCell>
+			</TableRow>
+		);
+	}
+
+	function SolveMenu(props: {
+		solve: Solve,
+		delete: () => void;
+		penalty: (dnf: boolean, plus_2: boolean) => void;
+		use_scramble: () => void;
+	}) {
+		const [penalty, setPenalty] = createSignal<string>(props.solve.dnf ? "dnf" : props.solve.plus_2 ? "+2" : "none");
+
+		return (
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<As
+						component={Button}
+						variant="ghost"
+						class="h-8 w-8 p-0"
+						aria-label="Solve actions">
+						<TbDots size={16} />
+					</As>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem onSelect={props.use_scramble}>
+						Use scramble
+					</DropdownMenuItem>
+					<DropdownMenuGroup>
+						<DropdownMenuGroupLabel>Penalty</DropdownMenuGroupLabel>
+						<DropdownMenuRadioGroup
+							value={penalty()}
+							onChange={penalty => {
+								setPenalty(penalty);
+
+								props.penalty(penalty === "dnf", penalty === "+2");
+							}}>
+							<DropdownMenuRadioItem value="none">
+								None
+							</DropdownMenuRadioItem>
+							<DropdownMenuRadioItem value="+2">
+								+2
+							</DropdownMenuRadioItem>
+							<DropdownMenuRadioItem value="dnf">
+								DNF
+							</DropdownMenuRadioItem>
+						</DropdownMenuRadioGroup>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		);
+	}
 }
