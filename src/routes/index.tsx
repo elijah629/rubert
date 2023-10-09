@@ -398,7 +398,6 @@ export default function Timer() {
 					</As>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
-					<DropdownMenuSeparator />
 					<DropdownMenuItem onSelect={props.use_scramble}>
 						Use scramble
 					</DropdownMenuItem>
