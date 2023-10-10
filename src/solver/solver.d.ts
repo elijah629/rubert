@@ -6,6 +6,7 @@
 */
 export function solve(facelets: Uint8Array): Uint8ClampedArray;
 /**
+* Half-random state. Generates random moves then solves.. the generated moves. SHOULD BE FINE.
 * @param {number} length
 * @returns {Uint8ClampedArray}
 */

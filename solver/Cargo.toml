@@ -21,6 +21,7 @@ console_error_panic_hook = { version = "0.1.7", optional = true }
 js-sys = "0.3.64"
 rand = "0.8.5"
 getrandom = { version = "0.2.10", features = ["js"] }
+lazy_static = "1.4.0"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.34"

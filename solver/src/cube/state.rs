@@ -1,7 +1,7 @@
 use crate::error::Error;
 
 use self::{Corner::*, Edge::*};
-use std::ops::Mul;
+use std::ops::{Mul, MulAssign};
 
 use super::{
     facelet::{Color, Cube, CORNER_COLOR, CORNER_FACELET, EDGE_COLOR, EDGE_FACELET},
@@ -81,6 +81,12 @@ pub struct State {
     pub eo: [u8; 12],
 }
 
+impl MulAssign for State {
+    fn mul_assign(&mut self, rhs: Self) {
+        *self = *self * rhs;
+    }
+}
+
 impl Mul for State {
     type Output = Self;
 
@@ -103,9 +109,9 @@ impl Mul for State {
     }
 }
 
-impl State {
-    pub fn apply_move(self, move_name: Move) -> Self {
-        let move_state = match move_name {
+impl From<Move> for State {
+    fn from(value: Move) -> Self {
+        match value {
             Move::U => U_MOVE,
             Move::U2 => U_MOVE * U_MOVE,
             Move::U3 => U_MOVE * U_MOVE * U_MOVE,
@@ -129,9 +135,13 @@ impl State {
             Move::B => B_MOVE,
             Move::B2 => B_MOVE * B_MOVE,
             Move::B3 => B_MOVE * B_MOVE * B_MOVE,
-        };
+        }
+    }
+}
 
-        self * move_state
+impl State {
+    pub fn apply_move(self, move_name: Move) -> Self {
+        self * move_name.into()
     }
 
     /// Returns the number of corner permutations needed to solve the corners.
