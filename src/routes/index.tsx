@@ -1,5 +1,5 @@
 import { Move as CMove } from "@/lib/cube";
-import { For, Show, createEffect, createSignal, on, onMount } from "solid-js";
+import { For, Show, createEffect, createMemo, createSignal, on, onMount } from "solid-js";
 import * as idb from "idb";
 import {
 	Select,
@@ -17,11 +17,7 @@ import {
 	SheetTrigger
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import {
-	TbDots,
-	TbFreezeColumn,
-	TbRefresh,
-} from "solid-icons/tb";
+import { TbDots, TbFreezeColumn, TbRefresh } from "solid-icons/tb";
 import {
 	Table,
 	TableBody,
@@ -43,13 +39,15 @@ import {
 	DropdownMenuGroupLabel,
 	DropdownMenuGroup,
 	DropdownMenuItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	DropdownMenuRadioItem,
 	DropdownMenuRadioGroup
 } from "@/components/ui/dropdown-menu";
+import { avg_of_n, cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/seperator";
 
-interface Solve {
+export interface Solve {
 	time: number;
 	dnf: boolean;
 	plus_2: boolean;
@@ -78,6 +76,9 @@ export default function Timer() {
 	const [scramble, setScramble] = createSignal<CMove[]>();
 	const [elapsed, setElapsed] = createSignal<number>();
 	const [running, setStarted] = createSignal<boolean>(false);
+	const [scrambleIcons, setScrambleIcons] = createSignal<boolean>(true);
+
+	const c_session = () => sessions()[session()!];
 
 	let start_time = null;
 	const newScramble = async () => {
@@ -107,7 +108,7 @@ export default function Timer() {
 			start_time = Date.now();
 		} else {
 			setSessions(sessions => {
-				const current = sessions[session()!];
+				const current = c_session();
 				current.solves.push({
 					time: elapsed()!,
 					scramble: scramble()!,
@@ -167,7 +168,7 @@ export default function Timer() {
 	return (
 		<div class="mt-2 flex flex-1 flex-col gap-2">
 			<Card class="flex flex-col gap-2 p-4">
-				<div class="flex gap-2">
+				<div class="flex items-center gap-2">
 					<Sheet>
 						<SheetTrigger asChild>
 							<As
@@ -187,51 +188,66 @@ export default function Timer() {
 									Manage your sessions
 								</SheetDescription>
 							</SheetHeader>
-							<div class="mt-2 flex flex-wrap gap-2">
-								<Select
-									value={session()}
-									onChange={setSession}
-									options={Object.keys(sessions())}
-									placeholder="Select a session…"
-									itemComponent={props => (
-										<SelectItem item={props.item}>
-											{props.item.rawValue}
-										</SelectItem>
-									)}>
-									<SelectTrigger
-										aria-label="Session"
-										class="w-[180px]">
-										<SelectValue<string>>
-											{state => state.selectedOption()}
-										</SelectValue>
-									</SelectTrigger>
-									<SelectContent />
-								</Select>
-								<NewSessionButton
-									onCreate={x => {
-										setSessions({
-											...sessions(),
-											[x]: { solves: [] }
-										});
-										setSession(x);
-									}}
-								/>
-								<DeleteSessionButton
-									has_session={!!session()}
-									onDelete={() => {
-										setSessions(sessions => {
-											delete sessions[session()!];
-											setSession(undefined);
-											return sessions;
-										});
-									}}
-								/>
-							</div>
-							<Show when={session()}>
-								<div class="mt-2 max-h-[calc(100vh-200px)]">
-									<SolveTable />
+
+							<div class="flex flex-col gap-2">
+								<div class="flex flex-wrap gap-2">
+									<Select
+										value={session()}
+										onChange={setSession}
+										options={Object.keys(sessions())}
+										placeholder="Select a session…"
+										itemComponent={props => (
+											<SelectItem item={props.item}>
+												{props.item.rawValue}
+											</SelectItem>
+										)}>
+										<SelectTrigger
+											aria-label="Session"
+											class="w-[180px]">
+											<SelectValue<string>>
+												{state =>
+													state.selectedOption()
+												}
+											</SelectValue>
+										</SelectTrigger>
+										<SelectContent />
+									</Select>
+									<NewSessionButton
+										onCreate={x => {
+											setSessions({
+												...sessions(),
+												[x]: { solves: [] }
+											});
+											setSession(x);
+										}}
+									/>
+									<DeleteSessionButton
+										has_session={!!session()}
+										onDelete={() => {
+											setSessions(sessions => {
+												delete sessions[session()!];
+												setSession(undefined);
+												return sessions;
+											});
+										}}
+									/>
 								</div>
-							</Show>
+								<Show when={session()}>
+									<div class="flex gap-2">
+										<Average
+											n={5}
+											session={c_session()}
+										/>
+										<Average
+											n={12}
+											session={c_session()}
+										/>
+									</div>
+									<div class="max-h-[calc(100vh-200px)]">
+										<SolveTable />
+									</div>
+								</Show>
+							</div>
 						</SheetContent>
 					</Sheet>
 					<Button
@@ -241,12 +257,34 @@ export default function Timer() {
 						onClick={newScramble}>
 						<TbRefresh size={24} />
 					</Button>
+					<Separator orientation="vertical" />
+					<Switch
+						label="Show icons"
+						checked={scrambleIcons()}
+						onChange={setScrambleIcons}
+					/>
 				</div>
 				<div
-					class={`flex gap-2 overflow-auto p-2 [&>*]:w-14 transition${
-						running() ? " blur grayscale" : ""
-					}`}>
-					<For each={scramble()}>{x => <Move move={x} />}</For>
+					class={cn(
+						"flex gap-2 overflow-auto p-2 transition",
+						running() && "blur grayscale",
+						scrambleIcons() ? "[&>*]:w-14" : "justify-center"
+					)}>
+					<For each={scramble()}>
+						{x => (
+							<Show
+								when={scrambleIcons()}
+								fallback={
+									<>
+										{CMove[x]
+											.replace("1", "")
+											.replace("3", "'") + " "}
+									</>
+								}>
+								<Move move={x} />
+							</Show>
+						)}
+					</For>
 				</div>
 			</Card>
 
@@ -281,26 +319,36 @@ export default function Timer() {
 							</Show>
 							.
 						</span>
-						<Show
-							when={
-								session() &&
-								sessions()[session()!].solves.length != 0
-							}>
-							<span class="text-muted">
-								{format_stopwatch(
-									sessions()
-										[session()!].solves.map(x => x.time)
-										.reduce((a, b) => a + b) /
-										sessions()[session()!].solves.length
-								)}{" "}
-								average
-							</span>
+						<Show when={session()}>
+							<Average
+								n={5}
+								session={c_session()}
+							/>
+							<Average
+								n={12}
+								session={c_session()}
+							/>
 						</Show>
 					</div>
 				</Show>
 			</div>
 		</div>
 	);
+
+	function Average(props: { session: Session; n: number }) {
+	    const average = createMemo<(number | false) | null>(() => props.session.solves.length >= props.n ? avg_of_n(props.session.solves, props.n) : null);
+						
+		return (
+			<>
+				<Show when={average() !== null}>
+					<span class="text-muted">
+						ao{props.n}{" "}
+						{average() === false ? "DNF" : format_stopwatch(average()! as number)}
+					</span>
+				</Show>
+			</>
+		);
+	}
 
 	function SolveTable() {
 		return (
@@ -312,7 +360,7 @@ export default function Timer() {
 					<TableRow>
 						<TableHead>Time</TableHead>
 						<TableHead>Scramble</TableHead>
-						<th/>
+						<th />
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -352,7 +400,7 @@ export default function Timer() {
 				</TableCell>
 				<TableCell class="flex flex-col gap-2 sm:flex-row">
 					<SolveMenu
-						solve={ props.solve}
+						solve={props.solve}
 						delete={() => {
 							setSessions(sessions => {
 								const current = sessions[session()!];
@@ -379,12 +427,14 @@ export default function Timer() {
 	}
 
 	function SolveMenu(props: {
-		solve: Solve,
+		solve: Solve;
 		delete: () => void;
 		penalty: (dnf: boolean, plus_2: boolean) => void;
 		use_scramble: () => void;
 	}) {
-		const [penalty, setPenalty] = createSignal<string>(props.solve.dnf ? "dnf" : props.solve.plus_2 ? "+2" : "none");
+		const [penalty, setPenalty] = createSignal<string>(
+			props.solve.dnf ? "dnf" : props.solve.plus_2 ? "+2" : "none"
+		);
 
 		return (
 			<DropdownMenu>
@@ -408,7 +458,10 @@ export default function Timer() {
 							onChange={penalty => {
 								setPenalty(penalty);
 
-								props.penalty(penalty === "dnf", penalty === "+2");
+								props.penalty(
+									penalty === "dnf",
+									penalty === "+2"
+								);
 							}}>
 							<DropdownMenuRadioItem value="none">
 								None
