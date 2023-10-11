@@ -451,6 +451,9 @@ export default function Timer() {
 					<DropdownMenuItem onSelect={props.use_scramble}>
 						Use scramble
 					</DropdownMenuItem>
+					<DropdownMenuItem onSelect={props.delete}>
+						Delete
+					</DropdownMenuItem>
 					<DropdownMenuGroup>
 						<DropdownMenuGroupLabel>Penalty</DropdownMenuGroupLabel>
 						<DropdownMenuRadioGroup
