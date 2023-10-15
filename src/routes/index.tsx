@@ -1,5 +1,14 @@
 import { Move as CMove } from "@/lib/cube";
-import { For, Show, createEffect, createMemo, createSignal, on, onMount } from "solid-js";
+import {
+	For,
+	Show,
+	createEffect,
+	createMemo,
+	createSignal,
+	on,
+	onCleanup,
+	onMount
+} from "solid-js";
 import * as idb from "idb";
 import {
 	Select,
@@ -67,6 +76,12 @@ function format_stopwatch(ms: number): string {
 	return `${minutes}:${seconds}.${ms_2}`;
 }
 
+enum TimerState {
+	Idle,
+	Running,
+	JustStopped
+}
+
 export default function Timer() {
 	const [sessions, setSessions] = createSignal<Record<string, Session>>(
 		{},
@@ -75,7 +90,9 @@ export default function Timer() {
 	const [session, setSession] = createSignal<string>();
 	const [scramble, setScramble] = createSignal<CMove[]>();
 	const [elapsed, setElapsed] = createSignal<number>();
-	const [running, setStarted] = createSignal<boolean>(false);
+	const [timerState, setTimerState] = createSignal<TimerState>(
+		TimerState.Idle
+	);
 	const [scrambleIcons, setScrambleIcons] = createSignal<boolean>(true);
 
 	const c_session = () => sessions()[session()!];
@@ -91,36 +108,85 @@ export default function Timer() {
 		const elapsed = Date.now() - start_time!;
 		setElapsed(elapsed);
 
-		if (running()) {
+		if (timerState() === TimerState.Running) {
 			window.requestAnimationFrame(update_timer);
 		}
 	};
+
+	createEffect(() => {
+		const window_keydown = (e: KeyboardEvent) => {
+			if (e.key !== " " || !session()) {
+				return;
+			}
+			e.preventDefault();
+
+			if (timerState() === TimerState.Running) {
+				setTimerState(TimerState.JustStopped);
+			}
+		};
+
+		const window_keyup = (e: KeyboardEvent) => {
+			if (e.key !== " " || !session()) {
+				return;
+			}
+			e.preventDefault();
+			setTimerState(
+				{
+					[TimerState.Idle]: TimerState.Running,
+					[TimerState.JustStopped]: TimerState.Idle,
+					[TimerState.Running]: TimerState.Running
+				}[timerState()]
+			);
+		};
+
+		window.addEventListener("keydown", window_keydown);
+		window.addEventListener("keyup", window_keyup);
+		onCleanup(() => {
+			window.removeEventListener("keydown", window_keydown);
+			window.removeEventListener("keyup", window_keyup);
+		});
+	});
 
 	onMount(newScramble);
 
-	const timer_toggle = () => {
-		if (!session()) {
-			return;
-		}
-		setStarted(!running());
-		if (running()) {
-			window.requestAnimationFrame(update_timer);
-			start_time = Date.now();
-		} else {
-			setSessions(sessions => {
-				const current = c_session();
-				current.solves.push({
-					time: elapsed()!,
-					scramble: scramble()!,
-					dnf: false,
-					plus_2: false
-				});
+	createEffect(
+		on(session, () => {
+			setTimerState(TimerState.Idle);
+			setElapsed(undefined);
+		})
+	);
 
-				newScramble();
-				return sessions;
-			});
-		}
-	};
+	createEffect(
+		on(
+			timerState,
+			() => {
+				switch (timerState()) {
+					case TimerState.Running:
+						window.requestAnimationFrame(update_timer);
+						start_time = Date.now();
+						break;
+					case TimerState.Idle:
+						setSessions(sessions => {
+							const current = c_session();
+							current.solves.push({
+								time: elapsed()!,
+								scramble: scramble()!,
+								dnf: false,
+								plus_2: false
+							});
+
+							newScramble();
+							return sessions;
+						});
+						break;
+				}
+				// I have no idea why, but if I check !session(), it causes an infinite loop of adding sessions crashing the tab.
+				// Loop starts from the TimerState.Idle case and it loops for some reason idk. Not running this when session changes
+				// fixes it. but I have to tell it to not run on startup because session is obviously undefined.
+			},
+			{ defer: true }
+		)
+	);
 
 	// onMount can't work because we would need to put a createEffect inside of an onMount and that disables destruction
 	if (typeof window !== "undefined") {
@@ -234,14 +300,14 @@ export default function Timer() {
 								</div>
 								<Show when={session()}>
 									<div class="flex gap-2">
-										<Average
-											n={5}
-											session={c_session()}
-										/>
-										<Average
-											n={12}
-											session={c_session()}
-										/>
+										<For each={[5, 12, 100]}>
+											{n => (
+												<Average
+													n={n}
+													session={c_session()}
+												/>
+											)}
+										</For>
 									</div>
 									<div class="max-h-[calc(100vh-200px)]">
 										<SolveTable />
@@ -267,7 +333,7 @@ export default function Timer() {
 				<div
 					class={cn(
 						"flex gap-2 overflow-auto p-2 transition",
-						running() && "blur grayscale",
+						timerState() === TimerState.Running && "blur grayscale",
 						scrambleIcons() ? "[&>*]:w-14" : "justify-center"
 					)}>
 					<For each={scramble()}>
@@ -291,12 +357,18 @@ export default function Timer() {
 			<div
 				class="flex flex-1 items-center justify-center outline-none"
 				tabindex="0"
-				onKeyDown={e => {
-					if (e.key === " ") {
-						timer_toggle();
+				onClick={() => {
+					if (!session()) {
+						return;
 					}
-				}}
-				onClick={() => timer_toggle()}>
+					setTimerState(
+						{
+							[TimerState.Running]: TimerState.Idle,
+							[TimerState.Idle]: TimerState.Running,
+							[TimerState.JustStopped]: TimerState.JustStopped
+						}[timerState()]
+					);
+				}}>
 				<Show
 					when={session()}
 					fallback={
@@ -313,21 +385,21 @@ export default function Timer() {
 						<span class="text-muted">
 							Presss space bar, tap or click to{" "}
 							<Show
-								when={!running()}
-								fallback={<>stop</>}>
-								start
+								when={timerState() === TimerState.Running}
+								fallback={<>start</>}>
+								stop
 							</Show>
 							.
 						</span>
 						<Show when={session()}>
-							<Average
-								n={5}
-								session={c_session()}
-							/>
-							<Average
-								n={12}
-								session={c_session()}
-							/>
+							<For each={[5, 12, 100]}>
+								{n => (
+									<Average
+										n={n}
+										session={c_session()}
+									/>
+								)}
+							</For>
 						</Show>
 					</div>
 				</Show>
@@ -336,14 +408,20 @@ export default function Timer() {
 	);
 
 	function Average(props: { session: Session; n: number }) {
-	    const average = createMemo<(number | false) | null>(() => props.session.solves.length >= props.n ? avg_of_n(props.session.solves, props.n) : null);
-						
+		const average = createMemo<(number | false) | null>(() =>
+			props.session.solves.length >= props.n
+				? avg_of_n(props.session.solves, props.n)
+				: null
+		);
+
 		return (
 			<>
 				<Show when={average() !== null}>
 					<span class="text-muted">
 						ao{props.n}{" "}
-						{average() === false ? "DNF" : format_stopwatch(average()! as number)}
+						{average() === false
+							? "DNF"
+							: format_stopwatch(average()! as number)}
 					</span>
 				</Show>
 			</>
