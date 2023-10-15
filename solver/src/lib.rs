@@ -42,13 +42,13 @@ pub fn solve(facelets: &[u8]) -> Result<Uint8ClampedArray, Error> {
     Ok(unsafe { Uint8ClampedArray::view_mut_raw(bytes.as_mut_ptr(), bytes.len()) })
 }
 
-/// Half-random state. Generates random moves then solves.. the generated moves. SHOULD BE FINE.
+/// Generates a random 3x3x3 scramble
 #[wasm_bindgen]
-pub fn generate_scramble(length: u8) -> Uint8ClampedArray {
+pub fn scramble_3x3x3() -> Uint8ClampedArray {
     let mut rng = thread_rng();
     let mut state = SOLVED_STATE;
 
-    for m in (0..length).scan(None, |last_move, _| {
+    for m in (0..20).scan(None, |last_move, _| {
         let possible_moves = match *last_move {
             Some(m) => MOVES
                 .iter()

@@ -36,7 +36,6 @@ import {
 	TableHeader,
 	TableRow
 } from "@/components/ui/table";
-import init, { generate_scramble } from "@/solver/solver";
 import Move from "@/components/Move";
 import { As } from "@kobalte/core";
 import { Card } from "@/components/ui/card";
@@ -55,6 +54,7 @@ import {
 import { avg_of_n, cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/seperator";
+import { scramblers } from "@/lib/scramblers";
 
 export interface Solve {
 	time: number;
@@ -90,6 +90,7 @@ export default function Timer() {
 	const [session, setSession] = createSignal<string>();
 	const [scramble, setScramble] = createSignal<CMove[]>();
 	const [elapsed, setElapsed] = createSignal<number>();
+	const [scrambler, setScrambler] = createSignal<string>(Object.keys(scramblers)[0]);
 	const [timerState, setTimerState] = createSignal<TimerState>(
 		TimerState.Idle
 	);
@@ -99,9 +100,7 @@ export default function Timer() {
 
 	let start_time = null;
 	const newScramble = async () => {
-		await init();
-
-		setScramble(Array.from(generate_scramble(20)));
+		setScramble(await scramblers[scrambler()]());
 	};
 
 	const update_timer = () => {
@@ -316,6 +315,7 @@ export default function Timer() {
 							</div>
 						</SheetContent>
 					</Sheet>
+					<Separator orientation="vertical" />
 					<Button
 						aria-label="Generate new scramble"
 						size="sm"
@@ -323,6 +323,28 @@ export default function Timer() {
 						onClick={newScramble}>
 						<TbRefresh size={24} />
 					</Button>
+					<Select
+										value={scrambler()}
+										onChange={async x => { setScrambler(x); if (x) {  await newScramble(); } }}
+										options={Object.keys(scramblers)}
+										placeholder="Select a scrambler…"
+										itemComponent={props => (
+											<SelectItem item={props.item}>
+												{props.item.rawValue}
+											</SelectItem>
+										)}>
+										<SelectTrigger
+											aria-label="Scrambler"
+											class="w-[180px]">
+											<SelectValue<string>>
+												{state =>
+													state.selectedOption()
+												}
+											</SelectValue>
+										</SelectTrigger>
+										<SelectContent />
+									</Select>
+
 					<Separator orientation="vertical" />
 					<Switch
 						label="Show icons"

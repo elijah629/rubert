@@ -87,12 +87,11 @@ export function solve(facelets) {
 }
 
 /**
-* Half-random state. Generates random moves then solves.. the generated moves. SHOULD BE FINE.
-* @param {number} length
+* Generates a random 3x3x3 scramble
 * @returns {Uint8ClampedArray}
 */
-export function generate_scramble(length) {
-    const ret = wasm.generate_scramble(length);
+export function scramble_3x3x3() {
+    const ret = wasm.scramble_3x3x3();
     return takeObject(ret);
 }
 

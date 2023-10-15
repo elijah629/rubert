@@ -6,18 +6,17 @@
 */
 export function solve(facelets: Uint8Array): Uint8ClampedArray;
 /**
-* Half-random state. Generates random moves then solves.. the generated moves. SHOULD BE FINE.
-* @param {number} length
+* Generates a random 3x3x3 scramble
 * @returns {Uint8ClampedArray}
 */
-export function generate_scramble(length: number): Uint8ClampedArray;
+export function scramble_3x3x3(): Uint8ClampedArray;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly solve: (a: number, b: number, c: number) => void;
-  readonly generate_scramble: (a: number) => number;
+  readonly scramble_3x3x3: () => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
