@@ -51,10 +51,10 @@ export default function Sessions(props: {
 	session: string | undefined;
 	setScramble: Setter<Move[] | undefined>;
 	setSession: Setter<string | undefined>;
-	setSessions: Setter<Record<string, Session>>;
-	sessions: Record<string, Session>;
+	setSessions: Setter<Map<string, Session>>;
+	sessions: Map<string, Session>;
 }) {
-	const c_session = () => props.sessions[props.session!];
+	const c_session = () => props.sessions.get(props.session!)!;
 
 	return (
 		<>
@@ -101,18 +101,19 @@ export default function Sessions(props: {
 							</Select>
 							<NewSessionButton
 								onCreate={x => {
-									props.setSessions({
-										...props.sessions,
-										[x]: { solves: [] }
-									});
-									props.setSession(x);
+									props.setSessions(sessions => {
+										sessions.set(x, { solves: [] });
+										props.setSession(x);
+										return sessions;
+									})
+
 								}}
 							/>
 							<DeleteSessionButton
 								has_session={!!props.session}
 								onDelete={() => {
 									props.setSessions(sessions => {
-										delete sessions[props.session!];
+										sessions.delete(props.session!);
 										props.setSession(undefined);
 										return sessions;
 									});
@@ -148,7 +149,7 @@ export default function Sessions(props: {
 function SolveTable(props: {
 	session: Session;
 	setScramble: Setter<Move[] | undefined>;
-	setSessions: Setter<Record<string, Session>>;
+	setSessions: Setter<Map<string, Session>>;
 }) {
 	return (
 		<Table>
@@ -192,7 +193,7 @@ function Solve(props: {
 	i: () => number;
 	setScramble: Setter<Move[] | undefined>;
 	session: Session;
-	setSessions: Setter<Record<string, Session>>;
+	setSessions: Setter<Map<string, Session>>;
 }) {
 	return (
 		<TableRow>

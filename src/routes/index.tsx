@@ -76,8 +76,8 @@ enum TimerState {
 }
 
 export default function Timer() {
-	const [sessions, setSessions] = createSignal<Record<string, Session>>(
-		{},
+	const [sessions, setSessions] = createSignal<Map<string, Session>>(
+		new Map(),
 		{ equals: false }
 	);
 	const [session, setSession] = createSignal<string>();
@@ -91,7 +91,7 @@ export default function Timer() {
 	);
 	const [scrambleIcons, setScrambleIcons] = createSignal<boolean>(true);
 
-	const c_session = () => sessions()[session()!];
+	const c_session = () => sessions().get(session()!)!;
 
 	let start_time = null;
 	const newScramble = async () => {
@@ -210,9 +210,9 @@ export default function Timer() {
 				store.delete(key);
 			}
 
-			for (const [name, session] of Object.entries(sessions())) {
+			sessions().forEach((session, name) => {
 				store.add(session, name);
-			}
+			});
 
 			tx.commit();
 		};
@@ -227,7 +227,7 @@ export default function Timer() {
 
 			const entries: [string, Session][] = k.map((k, i) => [k, v[i]]);
 
-			setSessions(Object.fromEntries(entries));
+			setSessions(new Map(entries));
 			can_update = true;
 		});
 	}
