@@ -14,7 +14,6 @@ import { createSignal } from "solid-js";
 import { Move } from "@/lib/cube";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { showToast } from "./toast";
 
 export default function ImportScramble(props: {
 	onImport: (scramble: Move[]) => void;
