@@ -1,4 +1,4 @@
-import { TbBrandGithub } from "solid-icons/tb";
+import { TbBrandGithub, TbBrandRust } from "solid-icons/tb";
 import { Button } from "@/components/ui/button";
 import { A } from "@solidjs/router";
 
@@ -24,6 +24,13 @@ export default function Navbar() {
 						</A>
 					</nav>
 					<div class="flex flex-1 items-center justify-end">
+						<a href="https://github.com/elijah629/rubert/tree/main/solver">
+							<Button
+								variant="ghost"
+								class="gap-2">
+								Powered by <TbBrandRust size={24} />
+							</Button>
+						</a>
 						<a
 							href="https://github.com/elijah629/rubert"
 							target="_blank"

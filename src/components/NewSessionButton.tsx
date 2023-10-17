@@ -47,6 +47,7 @@ export default function NewSessionButton(props: {
 								Name
 							</Label>
 							<Input
+								required
 								id="name"
 								class="col-span-3"
 								ref={name_feild}
@@ -56,8 +57,12 @@ export default function NewSessionButton(props: {
 					<DialogFooter>
 						<Button
 							onClick={() => {
-								setOpen(false);
+								if (!name_feild.reportValidity()) {
+								    return;
+								}
+
 								props.onCreate(name_feild.value);
+								setOpen(false);
 							}}>
 							Create
 						</Button>

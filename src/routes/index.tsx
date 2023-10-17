@@ -17,45 +17,16 @@ import {
 	SelectTrigger,
 	SelectValue
 } from "@/components/ui/select";
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-	SheetTrigger
-} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { TbDots, TbFreezeColumn, TbRefresh } from "solid-icons/tb";
-import {
-	Table,
-	TableBody,
-	TableCaption,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow
-} from "@/components/ui/table";
+import { TbRefresh } from "solid-icons/tb";
 import Move from "@/components/Move";
-import { As } from "@kobalte/core";
 import { Card } from "@/components/ui/card";
-import NewSessionButton from "@/components/NewSessionButton";
-import DeleteSessionButton from "@/components/DeleteSessionButton";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroupLabel,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-	DropdownMenuRadioItem,
-	DropdownMenuRadioGroup
-} from "@/components/ui/dropdown-menu";
 import { avg_of_n, cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/seperator";
 import { scramblers } from "@/lib/scramblers";
 import Sessions from "@/components/Sessions";
+import ImportScramble from "@/components/ImportScramble";
 
 export interface Solve {
 	time: number;
@@ -304,7 +275,7 @@ export default function Timer() {
 						</SelectTrigger>
 						<SelectContent />
 					</Select>
-
+					<ImportScramble onImport={setScramble} />
 					<Separator orientation="vertical" />
 					<Switch
 						label="Show icons"

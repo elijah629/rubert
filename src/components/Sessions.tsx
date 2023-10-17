@@ -45,6 +45,7 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import AddSolve from "./AddSolve";
 
 export default function Sessions(props: {
 	session: string | undefined;
@@ -156,7 +157,17 @@ function SolveTable(props: {
 				<TableRow>
 					<TableHead>Time</TableHead>
 					<TableHead>Scramble</TableHead>
-					<th />
+					<TableHead>
+						<AddSolve
+							onAdd={s => {
+								props.setSessions(sessions => {
+									const current = props.session;
+									current.solves.push(s);
+									return sessions;
+								});
+							}}
+						/>
+					</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>

@@ -11,7 +11,7 @@ export enum FaceletColor {
 }
 
 /**
- * A possible move. Interopts with WASM
+ * A possible move. Interopts with the WASM module
  */
 export enum Move {
 	U1,
