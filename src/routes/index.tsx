@@ -235,7 +235,7 @@ export default function Timer() {
 	return (
 		<div class="mt-2 flex flex-1 flex-col gap-2">
 			<Card class="flex flex-col gap-2 p-4">
-				<div class="flex items-center gap-2">
+				<div class="flex items-center flex-wrap gap-2">
 					<Sessions
 						session={session()}
 						sessions={sessions()}
@@ -268,7 +268,7 @@ export default function Timer() {
 						)}>
 						<SelectTrigger
 							aria-label="Scrambler"
-							class="w-[180px]">
+							class="w-[90px] sm:w-[180px]">
 							<SelectValue<string>>
 								{state => state.selectedOption()}
 							</SelectValue>

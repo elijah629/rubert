@@ -64,7 +64,7 @@ export default function Sessions(props: {
 						component={Button}
 						size="sm"
 						class="gap-2">
-						Sessions
+						<span class="hidden sm:visible">Sessions</span>
 						<TbFreezeColumn size={24} />
 					</As>
 				</SheetTrigger>
