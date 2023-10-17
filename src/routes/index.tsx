@@ -254,13 +254,13 @@ export default function Timer() {
 					<Select
 						value={scrambler()}
 						onChange={async x => {
-							setScrambler(x);
 							if (x) {
+								setScrambler(x);
 								await newScramble();
 							}
 						}}
 						options={Object.keys(scramblers)}
-						placeholder="Select a scrambler…"
+						// placeholder="Select a scrambler…"
 						itemComponent={props => (
 							<SelectItem item={props.item}>
 								{props.item.rawValue}
