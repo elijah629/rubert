@@ -14,7 +14,6 @@ import {
 } from "solid-start";
 import Navbar from "./components/navbar";
 import "./root.css";
-import { Toaster } from "./components/toast";
 
 export default function Root() {
 	return (
@@ -44,7 +43,6 @@ export default function Root() {
 						<Routes>
 							<FileRoutes />
 						</Routes>
-						<Toaster />
 					</ErrorBoundary>
 				</Suspense>
 				<Scripts />
