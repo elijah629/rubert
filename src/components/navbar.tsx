@@ -28,7 +28,7 @@ export default function Navbar() {
 							<Button
 								variant="ghost"
 								class="gap-2">
-								Powered by <TbBrandRust size={24} />
+								<TbBrandRust size={24} />
 							</Button>
 						</a>
 						<a
