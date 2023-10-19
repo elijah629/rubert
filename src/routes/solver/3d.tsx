@@ -147,7 +147,7 @@ export default function InteractiveCube() {
 			for (let i = 0; i < intersects.length; i++) {
 				const faceIndex = intersects[i]?.faceIndex!;
 				const face = Math.floor(Math.floor(faceIndex / 2) / 9);
-				const facelet = [6, 3, 2, 1, 4, 5, 0, 7, 8][
+				const facelet = [6, 7, 4, 1, 2, 3, 0, 5, 8][
 					Math.floor(faceIndex / 2) % 9
 				];
 
