@@ -1,9 +1,9 @@
 import ColorPicker from "@/components/ColorPicker";
 import SolveButton from "@/components/SolveButton";
 import { FaceletColor } from "@/lib/cube";
-import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { createSignal, onCleanup, onMount } from "solid-js";
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { OrbitControls } from "@/lib/orbit/orbitcontrols";
 
 const facelet_to_rgb = (x: FaceletColor) =>
 	[
