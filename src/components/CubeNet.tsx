@@ -1,8 +1,8 @@
-import { PartialCube, FaceletColor, facelet_color } from "@/lib/cube";
+import { FaceletColor, facelet_color } from "@/lib/cube";
 import { For } from "solid-js";
 
 export default function CubeNet(props: {
-	value: PartialCube;
+	value: Map<FaceletColor, FaceletColor[]>;
 	onClick?: (face: FaceletColor, index: number) => void;
 }) {
 	function DisplayFace(fprops: { face: FaceletColor }) {
@@ -21,7 +21,7 @@ export default function CubeNet(props: {
 					"grid-row-start": start[1],
 					"grid-column-start": start[0]
 				}}>
-				<For each={props.value[fprops.face]}>
+				<For each={props.value.get(fprops.face)}>
 					{(x, i) => {
 						const [h, s, l] = facelet_color[x as any];
 						return props.onClick ? (

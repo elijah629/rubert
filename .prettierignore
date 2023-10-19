@@ -28,6 +28,7 @@ gitignore
 Thumbs.db
 
 # WASM
-solver
+/solver
+src/solver
 
 public

@@ -1,6 +1,6 @@
 import CubeNet from "@/components/CubeNet";
 import { Card } from "@/components/ui/card";
-import { PartialCube, FaceletColor } from "@/lib/cube";
+import { FaceletColor } from "@/lib/cube";
 import { createEffect, createSignal, on, onMount } from "solid-js";
 import { scan_cube } from "@/lib/scanning";
 import SolveButton from "@/components/SolveButton";
@@ -11,27 +11,32 @@ export default function Scan() {
 	let canvas!: HTMLCanvasElement;
 	let video!: HTMLVideoElement;
 
-    const isRouting = useIsRouting();
+	const isRouting = useIsRouting();
 
-		createEffect(on(isRouting, () => {
-		    const stream = video.srcObject as MediaStream | null;
-		    const tracks = stream?.getTracks();
-				
-		    if (!tracks) {
+	createEffect(
+		on(isRouting, () => {
+			const stream = video.srcObject as MediaStream | null;
+			const tracks = stream?.getTracks();
+
+			if (!tracks) {
 				return;
 			}
 
 			for (const track of tracks) {
-	    		track.stop();
+				track.stop();
 			}
-		}));
+		})
+	);
 
-	const [cube, setCube] = createSignal<PartialCube>({}, { equals: false });
+	const [cube, setCube] = createSignal<Map<FaceletColor, FaceletColor[]>>(
+		new Map(),
+		{ equals: false }
+	);
 	const [color, setColor] = createSignal<FaceletColor | null>(null);
 
 	setCube(cube => {
 		for (let i = 0; i <= 5; i++) {
-			cube[i as FaceletColor] = [i, i, i, i, i, i, i, i, i];
+			cube.set(i as FaceletColor, Array(9).fill(i));
 		}
 		return cube;
 	});
@@ -102,7 +107,7 @@ export default function Scan() {
 			<script
 				type="text/javascript"
 				src="/js/opencv.js"></script>
-			<Card class="flex flex-col justify-between p-4 mb-4 sm:h-80 sm:flex-row">
+			<Card class="mb-4 flex flex-col justify-between p-4 sm:h-80 sm:flex-row">
 				<canvas
 					ref={canvas}
 					class="w-auto rounded-md border-2"></canvas>
@@ -122,7 +127,9 @@ export default function Scan() {
 					}
 
 					setCube(cube => {
-						cube[face]![i] = color();
+						const new_face = cube.get(face)!;
+						new_face[i] = color()!;
+						cube.set(face, new_face);
 						return cube;
 					});
 				}}

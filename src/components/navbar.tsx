@@ -12,7 +12,7 @@ export default function Navbar() {
 						class="mr-6 flex items-center font-bold">
 						<img
 							alt=""
-							src="/icon.png"
+							src="/favicon.ico"
 							class="inline h-10 w-10 p-2"></img>
 						Rubert
 					</A>
@@ -27,7 +27,9 @@ export default function Navbar() {
 						<a href="https://github.com/elijah629/rubert/tree/main/solver">
 							<Button
 								variant="ghost"
-								class="gap-2">
+								size="sm"
+								aria-label="Rust"
+								class="h-10 w-10 p-0">
 								<TbBrandRust size={24} />
 							</Button>
 						</a>

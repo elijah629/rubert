@@ -58,7 +58,7 @@ export default function NewSessionButton(props: {
 						<Button
 							onClick={() => {
 								if (!name_feild.reportValidity()) {
-								    return;
+									return;
 								}
 
 								props.onCreate(name_feild.value);

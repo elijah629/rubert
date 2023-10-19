@@ -27,6 +27,7 @@ import { Separator } from "@/components/ui/seperator";
 import { scramblers } from "@/lib/scramblers";
 import Sessions from "@/components/Sessions";
 import ImportScramble from "@/components/ImportScramble";
+import { ReactiveMap } from "@solid-primitives/map";
 
 export interface Solve {
 	time: number;
@@ -90,8 +91,6 @@ export default function Timer() {
 		TimerState.Idle
 	);
 	const [scrambleIcons, setScrambleIcons] = createSignal<boolean>(true);
-
-	const c_session = () => sessions().get(session()!)!;
 
 	let start_time = null;
 	const newScramble = async () => {
@@ -168,14 +167,17 @@ export default function Timer() {
 						break;
 					case TimerState.JustStopped:
 						setSessions(sessions => {
-							const current = c_session();
-							current.solves.push({
-								time: elapsed()!,
-								scramble: scramble()!,
-								dnf: false,
-								plus_2: false
+							sessions.set(session()!, {
+								solves: [
+									...sessions.get(session()!)!.solves,
+									{
+										time: elapsed()!,
+										scramble: scramble()!,
+										dnf: false,
+										plus_2: false
+									}
+								]
 							});
-
 							newScramble();
 							return sessions;
 						});
@@ -199,25 +201,25 @@ export default function Timer() {
 			}
 		});
 
-		const update = async () => {
-			if (!can_update) {
-				return;
-			}
-			const tx = (await db).transaction("sessions", "readwrite");
-			const store = tx.objectStore("sessions");
+		createEffect(
+			on(sessions, async () => {
+				if (!can_update) {
+					return;
+				}
+				const tx = (await db).transaction("sessions", "readwrite");
+				const store = tx.objectStore("sessions");
 
-			for (const key of await store.getAllKeys()) {
-				store.delete(key);
-			}
+				for (const key of await store.getAllKeys()) {
+					store.delete(key);
+				}
 
-			sessions().forEach((session, name) => {
-				store.add(session, name);
-			});
+				sessions().forEach((session, name) => {
+					store.add(session, name);
+				});
 
-			tx.commit();
-		};
-
-		createEffect(on(sessions, update));
+				tx.commit();
+			})
+		);
 		onMount(async () => {
 			const tx = (await db).transaction("sessions", "readonly");
 			const store = tx.objectStore("sessions");
@@ -225,9 +227,12 @@ export default function Timer() {
 			const k: string[] = (await store.getAllKeys()) as string[];
 			const v: Session[] = await store.getAll();
 
-			const entries: [string, Session][] = k.map((k, i) => [k, v[i]]);
-
-			setSessions(new Map(entries));
+			setSessions(sessions => {
+				for (let i = 0; i < k.length; i++) {
+					sessions.set(k[i], v[i]);
+				}
+				return sessions;
+			});
 			can_update = true;
 		});
 	}
@@ -235,12 +240,12 @@ export default function Timer() {
 	return (
 		<div class="mt-2 flex flex-1 flex-col gap-2">
 			<Card class="flex flex-col gap-2 p-4">
-				<div class="flex items-center flex-wrap gap-2">
+				<div class="flex items-center gap-2 overflow-auto">
 					<Sessions
 						session={session()}
 						sessions={sessions()}
-						setSessions={setSessions}
 						setSession={setSession}
+						setSessions={setSessions}
 						setScramble={setScramble}
 					/>
 					<Separator orientation="vertical" />
@@ -268,7 +273,7 @@ export default function Timer() {
 						)}>
 						<SelectTrigger
 							aria-label="Scrambler"
-							class="w-[90px] sm:w-[180px]">
+							class="w-24 sm:w-44">
 							<SelectValue<string>>
 								{state => state.selectedOption()}
 							</SelectValue>
@@ -349,7 +354,8 @@ export default function Timer() {
 								{n => (
 									<Average
 										n={n}
-										session={c_session()}
+										session={(() =>
+											sessions().get(session()!)!)()}
 									/>
 								)}
 							</For>

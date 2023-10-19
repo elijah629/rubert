@@ -68,9 +68,9 @@ export default function ImportScramble(props: {
 						<Button
 							onClick={() => {
 								if (!scramble_feild.reportValidity()) {
-								    return;
+									return;
 								}
-										
+
 								const name_to_move: Record<string, Move> = {
 									"U": Move.U1,
 									"U2": Move.U2,

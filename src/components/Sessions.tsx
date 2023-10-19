@@ -64,7 +64,7 @@ export default function Sessions(props: {
 						component={Button}
 						size="sm"
 						class="gap-2">
-						<span class="hidden sm:visible">Sessions</span>
+						<span class="hidden sm:inline">Sessions</span>
 						<TbFreezeColumn size={24} />
 					</As>
 				</SheetTrigger>
@@ -83,7 +83,7 @@ export default function Sessions(props: {
 							<Select
 								value={props.session}
 								onChange={props.setSession}
-								options={Object.keys(props.sessions)}
+								options={[...props.sessions.keys()]}
 								placeholder="Select a session…"
 								itemComponent={props => (
 									<SelectItem item={props.item}>
@@ -105,8 +105,7 @@ export default function Sessions(props: {
 										sessions.set(x, { solves: [] });
 										props.setSession(x);
 										return sessions;
-									})
-
+									});
 								}}
 							/>
 							<DeleteSessionButton
@@ -135,7 +134,8 @@ export default function Sessions(props: {
 								<SolveTable
 									setScramble={props.setScramble}
 									setSessions={props.setSessions}
-									session={c_session()}
+									sessions={props.sessions}
+									session={props.session!}
 								/>
 							</div>
 						</Show>
@@ -147,7 +147,8 @@ export default function Sessions(props: {
 }
 
 function SolveTable(props: {
-	session: Session;
+	session: string;
+	sessions: Map<string, Session>;
 	setScramble: Setter<Move[] | undefined>;
 	setSessions: Setter<Map<string, Session>>;
 }) {
@@ -162,8 +163,13 @@ function SolveTable(props: {
 						<AddSolve
 							onAdd={s => {
 								props.setSessions(sessions => {
-									const current = props.session;
-									current.solves.push(s);
+									sessions.set(props.session, {
+										solves: [
+											...sessions.get(props.session)!
+												.solves,
+											s
+										]
+									});
 									return sessions;
 								});
 							}}
@@ -172,7 +178,7 @@ function SolveTable(props: {
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				<For each={props.session.solves}>
+				<For each={props.sessions.get(props.session)!.solves}>
 					{(solve, i) => (
 						<Solve
 							setSessions={props.setSessions}
@@ -192,7 +198,7 @@ function Solve(props: {
 	solve: ISolve;
 	i: () => number;
 	setScramble: Setter<Move[] | undefined>;
-	session: Session;
+	session: string;
 	setSessions: Setter<Map<string, Session>>;
 }) {
 	return (
@@ -218,19 +224,21 @@ function Solve(props: {
 					solve={props.solve}
 					delete={() => {
 						props.setSessions(sessions => {
-							const current = props.session;
-							current.solves.splice(props.i(), 1);
+							const new_session = sessions.get(props.session)!;
+							new_session.solves.splice(props.i(), 1);
+							sessions.set(props.session, new_session);
 							return sessions;
 						});
 					}}
 					penalty={(dnf, plus_2) => {
 						props.setSessions(sessions => {
-							const current = props.session;
-							current.solves.splice(props.i(), 1, {
+							const new_session = sessions.get(props.session)!;
+							new_session.solves.splice(props.i(), 1, {
 								...props.solve,
 								dnf,
 								plus_2
 							});
+							sessions.set(props.session, new_session);
 							return sessions;
 						});
 					}}
