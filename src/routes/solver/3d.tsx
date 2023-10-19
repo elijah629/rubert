@@ -3,17 +3,16 @@ import SolveButton from "@/components/SolveButton";
 import { FaceletColor } from "@/lib/cube";
 import { createSignal, onCleanup, onMount } from "solid-js";
 import * as THREE from "three";
-import { OrbitControls } from "@/lib/orbit/orbitcontrols";
+import { OrbitControls } from "@/lib/orbitcontrols";
 
-const facelet_to_rgb = (x: FaceletColor) =>
-	[
-		[255, 0, 0],
-		[255, 140, 0],
-		[0, 0, 255],
-		[0, 255, 0],
-		[255, 255, 255],
-		[255, 255, 0]
-	][x] as [number, number, number];
+const facelet_rgb: Record<FaceletColor | any, [number, number, number]> = {
+	[FaceletColor.Red]: [255, 0, 0],
+	[FaceletColor.Orange]: [255, 165, 0],
+	[FaceletColor.Blue]: [0, 0, 255],
+	[FaceletColor.Green]: [0, 255, 0],
+	[FaceletColor.White]: [255, 255, 255],
+	[FaceletColor.Yellow]: [255, 255, 0]
+};
 
 export default function InteractiveCube() {
 	let canvas!: HTMLCanvasElement;
@@ -103,7 +102,7 @@ export default function InteractiveCube() {
 		for (let i = 0; i < 6; i++) {
 			for (let j = 0; j < 9; j++) {
 				const x = j + 9 * i;
-				const rgb = facelet_to_rgb(cube().get(i)![j]);
+				const rgb = facelet_rgb[cube().get(i)![j]];
 				for (const i of Array.from(
 					{ length: 3 * 2 },
 					(_, i) => i + x * 6
@@ -121,6 +120,8 @@ export default function InteractiveCube() {
 
 		{
 			const mesh = new THREE.Mesh(geometry, material);
+			mesh.rotateX(-Math.PI / 2);
+			mesh.rotateZ(-Math.PI / 2);
 			scene.add(mesh);
 		}
 
@@ -146,7 +147,9 @@ export default function InteractiveCube() {
 			for (let i = 0; i < intersects.length; i++) {
 				const faceIndex = intersects[i]?.faceIndex!;
 				const face = Math.floor(Math.floor(faceIndex / 2) / 9);
-				const facelet = Math.floor(faceIndex / 2) % 9;
+				const facelet = [6, 3, 2, 1, 4, 5, 0, 7, 8][
+					Math.floor(faceIndex / 2) % 9
+				];
 
 				setCube(cube => {
 					const new_face = cube.get(face)!;
@@ -156,7 +159,7 @@ export default function InteractiveCube() {
 					return cube;
 				});
 
-				const rgb = facelet_to_rgb(color()!);
+				const rgb = facelet_rgb[color()!];
 				const x = Math.floor(faceIndex / 2);
 				for (const i of Array.from(
 					{ length: 3 * 2 },

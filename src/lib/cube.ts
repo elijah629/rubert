@@ -71,14 +71,13 @@ export function wasm_facelets(
 	return Uint8Array.from(numbers.map(x => [2, 5, 1, 4, 0, 3][x])); // FBRLUD, check the facelets.rs Color struct for more info on these numbers
 }
 
-export const facelet_color: Record<
-	FaceletColor | any,
-	[number, number, number]
-> = {
-	[FaceletColor.Red]: [0, 100, 59],
-	[FaceletColor.Orange]: [30, 100, 59],
-	[FaceletColor.Blue]: [223, 100, 59],
-	[FaceletColor.Green]: [129, 100, 40],
-	[FaceletColor.White]: [0, 0, 100],
-	[FaceletColor.Yellow]: [50, 100, 59]
-};
+/** HSL */
+export const facelet_hsl: Record<FaceletColor | any, [number, number, number]> =
+	{
+		[FaceletColor.Red]: [0, 100, 59],
+		[FaceletColor.Orange]: [30, 100, 59],
+		[FaceletColor.Blue]: [223, 100, 59],
+		[FaceletColor.Green]: [129, 100, 40],
+		[FaceletColor.White]: [0, 0, 100],
+		[FaceletColor.Yellow]: [50, 100, 59]
+	};

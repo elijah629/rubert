@@ -1,6 +1,6 @@
 import { For } from "solid-js";
 import { Card } from "./ui/card";
-import { FaceletColor, facelet_color } from "@/lib/cube";
+import { FaceletColor, facelet_hsl } from "@/lib/cube";
 
 export default function ColorPicker(props: {
 	value: FaceletColor | null;
@@ -10,7 +10,7 @@ export default function ColorPicker(props: {
 		<Card class="grid grid-cols-3 grid-rows-2 gap-1 p-4">
 			<For each={[...Array(6).keys()]}>
 				{fcolor => {
-					const [h, s, l] = facelet_color[fcolor as any];
+					const [h, s, l] = facelet_hsl[fcolor as any];
 					return (
 						<div
 							onClick={() => props.onChange(fcolor)}
