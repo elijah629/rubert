@@ -1,31 +1,37 @@
 import ColorPicker from "@/components/ColorPicker";
 import SolveButton from "@/components/SolveButton";
-import { FaceletColor } from "@/lib/cube";
+import { Cube, Face, FaceletColor } from "@/lib/cube";
 import { createSignal, onCleanup, onMount } from "solid-js";
 import * as THREE from "three";
 import { OrbitControls } from "@/lib/orbitcontrols";
 
-const facelet_rgb: Record<FaceletColor | any, [number, number, number]> = {
-	[FaceletColor.Red]: [255, 0, 0],
-	[FaceletColor.Orange]: [255, 165, 0],
-	[FaceletColor.Blue]: [0, 0, 255],
-	[FaceletColor.Green]: [0, 255, 0],
-	[FaceletColor.White]: [255, 255, 255],
-	[FaceletColor.Yellow]: [255, 255, 0]
-};
+const facelet_rgb: Map<FaceletColor, [number, number, number]> = new Map([
+	[FaceletColor.Red, [255, 0, 0]],
+	[FaceletColor.Orange, [255, 69, 0]],
+	[FaceletColor.Blue, [0, 0, 255]],
+	[FaceletColor.Green, [0, 255, 0]],
+	[FaceletColor.White, [255, 255, 255]],
+	[FaceletColor.Yellow, [255, 255, 0]]
+]);
+
+const face_orientation_map: Map<FaceletColor, number[]> = new Map([
+	[FaceletColor.Red, [2, 5, 8, 1, 4, 7, 0, 3, 6]],
+	[FaceletColor.Orange, [6, 3, 0, 7, 4, 1, 8, 5, 2]],
+	[FaceletColor.Blue, [8, 7, 6, 5, 4, 3, 2, 1, 0]],
+	[FaceletColor.Green, [0, 1, 2, 3, 4, 5, 6, 7, 8]],
+	[FaceletColor.White, [2, 5, 8, 1, 4, 7, 0, 3, 6]],
+	[FaceletColor.Yellow, [2, 5, 8, 1, 4, 7, 0, 3, 6]]
+]);
 
 export default function InteractiveCube() {
 	let canvas!: HTMLCanvasElement;
 
-	const [cube, setCube] = createSignal<Map<FaceletColor, FaceletColor[]>>(
-		new Map(),
-		{ equals: false }
-	);
+	const [cube, setCube] = createSignal<Cube>(new Map(), { equals: false });
 	const [color, setColor] = createSignal<FaceletColor | null>(null);
 
 	setCube(cube => {
 		for (let i = 0; i <= 5; i++) {
-			cube.set(i as FaceletColor, Array(9).fill(i));
+			cube.set(i as FaceletColor, Array(9).fill(i) as Face);
 		}
 		return cube;
 	});
@@ -102,7 +108,7 @@ export default function InteractiveCube() {
 		for (let i = 0; i < 6; i++) {
 			for (let j = 0; j < 9; j++) {
 				const x = j + 9 * i;
-				const rgb = facelet_rgb[cube().get(i)![j]];
+				const rgb = facelet_rgb.get(cube().get(i)![j])!;
 				for (const i of Array.from(
 					{ length: 3 * 2 },
 					(_, i) => i + x * 6
@@ -136,6 +142,11 @@ export default function InteractiveCube() {
 			controls.enablePan = false;
 		}
 
+		/*	const m = new Map<FaceletColor, number[]>();
+
+		for (let i = 0; i < 6; i++) {
+				m.set(i, []);
+		}*/
 		canvas.addEventListener("click", () => {
 			if (color() === null) {
 				return;
@@ -147,9 +158,9 @@ export default function InteractiveCube() {
 			for (let i = 0; i < intersects.length; i++) {
 				const faceIndex = intersects[i]?.faceIndex!;
 				const face = Math.floor(Math.floor(faceIndex / 2) / 9);
-				const facelet = [6, 3, 2, 1, 4, 5, 0, 7, 8][
-					Math.floor(faceIndex / 2) % 9
-				];
+				const mapper = face_orientation_map.get(face)!;
+				const facelet = mapper[Math.floor(faceIndex / 2) % 9];
+				// console.log(facelet, Math.floor(faceIndex / 2) % 9);
 
 				setCube(cube => {
 					const new_face = cube.get(face)!;
@@ -159,7 +170,7 @@ export default function InteractiveCube() {
 					return cube;
 				});
 
-				const rgb = facelet_rgb[color()!];
+				const rgb = facelet_rgb.get(color()!)!;
 				const x = Math.floor(faceIndex / 2);
 				for (const i of Array.from(
 					{ length: 3 * 2 },

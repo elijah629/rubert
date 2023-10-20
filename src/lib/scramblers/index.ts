@@ -27,20 +27,23 @@ ALG.flat().map(x => x.split(" ").map(x => ({
 ```
  * Then I minified the outputted array
 */
-export const scramblers: Record<string, () => Move[] | Promise<Move[]>> = {
-	"3x3x3": async () => {
-		// Ensure the WASM module is loaded
-		await init();
-		return Array.from(scramble_3x3x3());
-	},
+export const scramblers: Map<string, () => Move[] | Promise<Move[]>> = new Map([
+	[
+		"3x3x3",
+		async () => {
+			// Ensure the WASM module is loaded
+			await init();
+			return Array.from(scramble_3x3x3());
+		}
+	],
 	// these files are HUGE!! only load them when they need to be loaded
 	// this also removes them from the main bundle decreasing load times
-	"Full PLL": async () => rand((await import("./full-pll")).default),
-	"Full OLL": async () => rand((await import("./full-oll")).default),
+	["Full PLL", async () => rand((await import("./full-pll")).default)],
+	["Full OLL", async () => rand((await import("./full-oll")).default)],
 
-	"2-Look PLL": async () => rand((await import("./2look-pll")).default),
-	"2-Look OLL": async () => rand((await import("./2look-oll")).default)
-};
+	["2-Look PLL", async () => rand((await import("./2look-pll")).default)],
+	["2-Look OLL", async () => rand((await import("./2look-oll")).default)]
+]);
 
 function rand<T>(arr: T[]): T {
 	return arr[Math.floor(Math.random() * arr.length)];

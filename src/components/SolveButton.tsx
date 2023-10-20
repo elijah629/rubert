@@ -1,9 +1,7 @@
-import { FaceletColor, wasm_facelets } from "@/lib/cube";
+import { Cube, FaceletColor, wasm_facelets } from "@/lib/cube";
 import { Button } from "./ui/button";
 
-export default function SolveButton(props: {
-	cube: Map<FaceletColor, FaceletColor[]>;
-}) {
+export default function SolveButton(props: { cube: Cube }) {
 	return (
 		<Button
 			onClick={() => {

@@ -1,6 +1,6 @@
 import CubeNet from "@/components/CubeNet";
 import { Card } from "@/components/ui/card";
-import { FaceletColor } from "@/lib/cube";
+import { Cube, Face, FaceletColor } from "@/lib/cube";
 import { createEffect, createSignal, on, onMount } from "solid-js";
 import { scan_cube } from "@/lib/scanning";
 import SolveButton from "@/components/SolveButton";
@@ -28,15 +28,12 @@ export default function Scan() {
 		})
 	);
 
-	const [cube, setCube] = createSignal<Map<FaceletColor, FaceletColor[]>>(
-		new Map(),
-		{ equals: false }
-	);
+	const [cube, setCube] = createSignal<Cube>(new Map(), { equals: false });
 	const [color, setColor] = createSignal<FaceletColor | null>(null);
 
 	setCube(cube => {
 		for (let i = 0; i <= 5; i++) {
-			cube.set(i as FaceletColor, Array(9).fill(i));
+			cube.set(i as FaceletColor, Array(9).fill(i) as Face);
 		}
 		return cube;
 	});
@@ -91,7 +88,12 @@ export default function Scan() {
 
 				const cube_partial = scan_cube(frame);
 				if (cube_partial) {
-					setCube({ ...cube(), ...cube_partial });
+					setCube(cube => {
+						cube_partial.forEach((facelets, face) => {
+							cube.set(face, facelets);
+						});
+						return cube;
+					});
 				}
 
 				cv.imshow(canvas, frame);

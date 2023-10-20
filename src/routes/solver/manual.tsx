@@ -1,19 +1,16 @@
 import ColorPicker from "@/components/ColorPicker";
 import CubeNet from "@/components/CubeNet";
 import SolveButton from "@/components/SolveButton";
-import { FaceletColor } from "@/lib/cube";
+import { Cube, Face, FaceletColor } from "@/lib/cube";
 import { createSignal } from "solid-js";
 
 export default function Manual() {
-	const [cube, setCube] = createSignal<Map<FaceletColor, FaceletColor[]>>(
-		new Map(),
-		{ equals: false }
-	);
+	const [cube, setCube] = createSignal<Cube>(new Map(), { equals: false });
 	const [color, setColor] = createSignal<FaceletColor | null>(null);
 
 	setCube(cube => {
 		for (let i = 0; i <= 5; i++) {
-			cube.set(i as FaceletColor, Array(9).fill(i));
+			cube.set(i as FaceletColor, Array(9).fill(i) as Face);
 		}
 		return cube;
 	});

@@ -1,8 +1,8 @@
-import { FaceletColor, facelet_hsl } from "@/lib/cube";
+import { Cube, FaceletColor, facelet_hsl } from "@/lib/cube";
 import { For } from "solid-js";
 
 export default function CubeNet(props: {
-	value: Map<FaceletColor, FaceletColor[]>;
+	value: Cube;
 	onClick?: (face: FaceletColor, index: number) => void;
 }) {
 	function DisplayFace(fprops: { face: FaceletColor }) {
@@ -23,7 +23,7 @@ export default function CubeNet(props: {
 				}}>
 				<For each={props.value.get(fprops.face)}>
 					{(x, i) => {
-						const [h, s, l] = facelet_hsl[x as any];
+						const [h, s, l] = facelet_hsl.get(x)!;
 						return props.onClick ? (
 							<button
 								aria-label={`Face ${

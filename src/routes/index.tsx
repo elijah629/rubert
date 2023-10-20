@@ -27,7 +27,6 @@ import { Separator } from "@/components/ui/seperator";
 import { scramblers } from "@/lib/scramblers";
 import Sessions from "@/components/Sessions";
 import ImportScramble from "@/components/ImportScramble";
-import { ReactiveMap } from "@solid-primitives/map";
 
 export interface Solve {
 	time: number;
@@ -85,23 +84,23 @@ export default function Timer() {
 	const [scramble, setScramble] = createSignal<CMove[]>();
 	const [elapsed, setElapsed] = createSignal<number>();
 	const [scrambler, setScrambler] = createSignal<string>(
-		Object.keys(scramblers)[0]
+		[...scramblers.keys()][0]
 	);
 	const [timerState, setTimerState] = createSignal<TimerState>(
 		TimerState.Idle
 	);
 	const [scrambleIcons, setScrambleIcons] = createSignal<boolean>(true);
 
-	let start_time = null;
+	let timer_element!: HTMLDivElement;
+
+	let start_time: number | null = null;
 	const newScramble = async () => {
-		setScramble(await scramblers[scrambler()]());
+		setScramble(await scramblers.get(scrambler())!());
 	};
 
 	const update_timer = () => {
-		const elapsed = Date.now() - start_time!;
-		setElapsed(elapsed);
-
 		if (timerState() === TimerState.Running) {
+			setElapsed(Date.now() - start_time!);
 			window.requestAnimationFrame(update_timer);
 		}
 	};
@@ -111,21 +110,20 @@ export default function Timer() {
 			if (
 				e.key !== " " ||
 				!session() ||
-				document.activeElement !== document.body
+				!document.activeElement?.contains(timer_element) ||
+				timerState() !== TimerState.Running
 			) {
 				return;
 			}
 
-			if (timerState() === TimerState.Running) {
-				setTimerState(TimerState.JustStopped);
-			}
+			setTimerState(TimerState.JustStopped);
 		};
 
 		const window_keyup = (e: KeyboardEvent) => {
 			if (
 				e.key !== " " ||
 				!session() ||
-				document.activeElement !== document.body
+				!document.activeElement?.contains(timer_element)
 			) {
 				return;
 			}
@@ -133,8 +131,8 @@ export default function Timer() {
 			setTimerState(
 				{
 					[TimerState.Idle]: TimerState.Running,
-					[TimerState.JustStopped]: TimerState.Idle,
-					[TimerState.Running]: TimerState.Running
+					[TimerState.Running]: TimerState.Running,
+					[TimerState.JustStopped]: TimerState.Idle
 				}[timerState()]
 			);
 		};
@@ -156,31 +154,35 @@ export default function Timer() {
 		})
 	);
 
+	const on_timer_ended = () => {
+		setSessions(sessions => {
+			sessions.set(session()!, {
+				solves: [
+					...sessions.get(session()!)!.solves,
+					{
+						time: elapsed()!,
+						scramble: scramble()!,
+						dnf: false,
+						plus_2: false
+					}
+				]
+			});
+			newScramble();
+			return sessions;
+		});
+	};
+
 	createEffect(
 		on(
 			timerState,
 			() => {
 				switch (timerState()) {
 					case TimerState.Running:
-						window.requestAnimationFrame(update_timer);
 						start_time = Date.now();
+						update_timer(); // Start timer loop
 						break;
 					case TimerState.JustStopped:
-						setSessions(sessions => {
-							sessions.set(session()!, {
-								solves: [
-									...sessions.get(session()!)!.solves,
-									{
-										time: elapsed()!,
-										scramble: scramble()!,
-										dnf: false,
-										plus_2: false
-									}
-								]
-							});
-							newScramble();
-							return sessions;
-						});
+						on_timer_ended();
 						break;
 				}
 				// I have no idea why, but if I check !session(), it causes an infinite loop of adding sessions crashing the tab.
@@ -264,7 +266,7 @@ export default function Timer() {
 								await newScramble();
 							}
 						}}
-						options={Object.keys(scramblers)}
+						options={[...scramblers.keys()]}
 						// placeholder="Select a scrambler…"
 						itemComponent={props => (
 							<SelectItem item={props.item}>
@@ -319,13 +321,13 @@ export default function Timer() {
 					if (!session()) {
 						return;
 					}
-					setTimerState(
-						{
-							[TimerState.Running]: TimerState.Idle,
-							[TimerState.Idle]: TimerState.Running,
-							[TimerState.JustStopped]: TimerState.JustStopped
-						}[timerState()]
-					);
+
+					if (timerState() === TimerState.Running) {
+						setTimerState(TimerState.Idle);
+						on_timer_ended();
+					} else if (timerState() === TimerState.Idle) {
+						setTimerState(TimerState.Running);
+					}
 				}}>
 				<Show
 					when={session()}
@@ -334,14 +336,16 @@ export default function Timer() {
 							Please select or create a session.
 						</span>
 					}>
-					<div class="flex flex-col items-center gap-2">
+					<div
+						class="flex flex-col items-center gap-2"
+						ref={timer_element}>
 						<Show when={elapsed()}>
 							<span class="font-mono text-5xl font-bold">
 								{format_stopwatch(elapsed()!)}
 							</span>
 						</Show>
 						<span class="text-muted">
-							Presss space bar, tap or click to{" "}
+							Press space bar, tap or click to{" "}
 							<Show
 								when={timerState() === TimerState.Running}
 								fallback={<>start</>}>

@@ -10,7 +10,7 @@ export default function ColorPicker(props: {
 		<Card class="grid grid-cols-3 grid-rows-2 gap-1 p-4">
 			<For each={[...Array(6).keys()]}>
 				{fcolor => {
-					const [h, s, l] = facelet_hsl[fcolor as any];
+					const [h, s, l] = facelet_hsl.get(fcolor)!;
 					return (
 						<div
 							onClick={() => props.onChange(fcolor)}

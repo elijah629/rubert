@@ -1,5 +1,4 @@
-import { Cube, FaceletColor, Face } from "@/lib/cube";
-
+import { FaceletColor, Face, Cube } from "@/lib/cube";
 export namespace cv {
 	export type Point = InstanceType<typeof window.cv.Point>;
 	export type Mat = InstanceType<typeof window.cv.Mat>;
@@ -135,9 +134,9 @@ function rotate_points(angle: number, center: cv.Point, points: cv.Point[]) {
  * information into a full cube and check for completeness.
  *
  * @param {cv.Mat} frame
- * @returns {false | Partial<Cube>}
+ * @returns {false | Cube}
  * */
-export function scan_cube(frame: cv.Mat): false | Partial<Cube> {
+export function scan_cube(frame: cv.Mat): false | Cube {
 	const out = new cv.Mat();
 	cv.cvtColor(frame, out, cv.COLOR_RGB2GRAY);
 	cv.GaussianBlur(out, out, new cv.Size(5, 5), 0);
@@ -221,7 +220,7 @@ export function scan_cube(frame: cv.Mat): false | Partial<Cube> {
 		}
 	}
 
-	let cube_partial: Partial<Cube> | null = null;
+	let cube_partial: Cube | null = null;
 
 	if (squares.length === 9) {
 		// Find avg_rot and avg_center
@@ -341,9 +340,7 @@ export function scan_cube(frame: cv.Mat): false | Partial<Cube> {
 			facelets[i] = facelet;
 		}
 
-		cube_partial = {
-			[facelets[4]]: facelets as Face
-		};
+		cube_partial = new Map([[facelets[4], facelets as Face]]);
 	}
 
 	for (const [rect] of squares) {
