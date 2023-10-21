@@ -3,10 +3,10 @@ import SolveButton from "@/components/SolveButton";
 import { Cube, Face, FaceletColor } from "@/lib/cube";
 import { createSignal, onCleanup, onMount } from "solid-js";
 import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
-import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OrbitControls } from "@/lib/orbitcontrols";
 
 const facelet_rgb: Map<FaceletColor, [number, number, number]> = new Map([
