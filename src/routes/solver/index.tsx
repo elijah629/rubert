@@ -1,12 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { A } from "@solidjs/router";
 import styles from "./solver.module.css";
-import { IconTypes } from "solid-icons";
-import { TbCamera, TbCube, TbKeyboard } from "solid-icons/tb";
+import { IconCamera, IconCube, IconKeyboard, IconProps } from "@/lib/icons";
+import { JSX } from "solid-js";
 
 function OptionCard(props: {
 	href: string;
-	icon: IconTypes;
+	icon: (props: IconProps) => JSX.Element;
 	title: string;
 	description: string;
 }) {
@@ -40,19 +40,19 @@ export default function Home() {
 					href="/solver/scan"
 					title="Scan"
 					description="Use your camera to scan your cube"
-					icon={TbCamera}
+					icon={IconCamera}
 				/>
 				<OptionCard
 					href="/solver/manual"
 					title="Manual"
 					description="Manually input the colors on your cube"
-					icon={TbKeyboard}
+					icon={IconKeyboard}
 				/>
 				<OptionCard
 					href="/solver/3d"
 					title="3D"
 					description="Input colors on a 3D model"
-					icon={TbCube}
+					icon={IconCube}
 				/>
 			</div>
 		</div>

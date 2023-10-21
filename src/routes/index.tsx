@@ -18,7 +18,6 @@ import {
 	SelectValue
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { TbRefresh } from "solid-icons/tb";
 import Move from "@/components/Move";
 import { Card } from "@/components/ui/card";
 import { avg_of_n, cn } from "@/lib/utils";
@@ -27,6 +26,7 @@ import { Separator } from "@/components/ui/seperator";
 import { scramblers } from "@/lib/scramblers";
 import Sessions from "@/components/Sessions";
 import ImportScramble from "@/components/ImportScramble";
+import { IconDownload, IconRefresh } from "@/lib/icons";
 
 export interface Solve {
 	time: number;
@@ -256,7 +256,7 @@ export default function Timer() {
 						size="sm"
 						variant="secondary"
 						onClick={newScramble}>
-						<TbRefresh size={24} />
+						<IconRefresh size={24} />
 					</Button>
 					<Select
 						value={scrambler()}

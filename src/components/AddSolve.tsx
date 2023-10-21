@@ -9,10 +9,9 @@ import {
 	DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { TbPlus } from "solid-icons/tb";
 import { createSignal } from "solid-js";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Solve } from "@/routes";
 import {
 	SelectItem,
@@ -20,8 +19,9 @@ import {
 	SelectValue,
 	SelectContent,
 	Select
-} from "./ui/select";
+} from "@/components/ui/select";
 import { name_to_move } from "@/lib/cube";
+import { IconPlus } from "@/lib/icons";
 
 export default function AddSolve(props: { onAdd: (solve: Solve) => void }) {
 	const [open, setOpen] = createSignal<boolean>(false);
@@ -39,7 +39,7 @@ export default function AddSolve(props: { onAdd: (solve: Solve) => void }) {
 					variant="ghost"
 					class="h-8 w-8 p-0"
 					aria-label="Solve actions">
-					<TbPlus size={16} />
+					<IconPlus size={16} />
 				</As>
 			</DialogTrigger>
 			<DialogContent>

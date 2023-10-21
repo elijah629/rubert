@@ -5,7 +5,11 @@ import { defineConfig } from "vite";
 import path from "node:path";
 
 export default defineConfig({
-	plugins: [solid({ adapter: vercel() })],
+	plugins: [
+		solid({
+			adapter: vercel()
+		})
+	],
 	build: {
 		target: "esnext"
 	},

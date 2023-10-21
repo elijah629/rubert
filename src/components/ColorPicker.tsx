@@ -1,5 +1,5 @@
 import { For } from "solid-js";
-import { Card } from "./ui/card";
+import { Card } from "@/components/ui/card";
 import { FaceletColor, facelet_hsl } from "@/lib/cube";
 
 export default function ColorPicker(props: {

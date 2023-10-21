@@ -9,11 +9,11 @@ import {
 	DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { TbDownload } from "solid-icons/tb";
 import { createSignal } from "solid-js";
 import { Move, name_to_move } from "@/lib/cube";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { IconDownload } from "@/lib/icons";
 
 export default function ImportScramble(props: {
 	onImport: (scramble: Move[]) => void;
@@ -29,7 +29,7 @@ export default function ImportScramble(props: {
 				<As
 					component={Button}
 					class="gap-2">
-					<TbDownload size={20} />
+					<IconDownload size={20} />
 				</As>
 			</DialogTrigger>
 			<DialogContent>

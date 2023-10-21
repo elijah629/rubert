@@ -9,8 +9,8 @@ import {
 	DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { TbTrash } from "solid-icons/tb";
 import { createSignal } from "solid-js";
+import { IconTrash } from "@/lib/icons";
 
 export default function DeleteSessionButton(props: {
 	has_session: boolean;
@@ -29,7 +29,7 @@ export default function DeleteSessionButton(props: {
 					variant="destructive"
 					class="gap-2">
 					Delete
-					<TbTrash size={20} />
+					<IconTrash size={20} />
 				</As>
 			</DialogTrigger>
 			<DialogContent>

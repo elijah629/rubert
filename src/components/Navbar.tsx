@@ -1,6 +1,6 @@
-import { TbBrandGithub, TbBrandRust } from "solid-icons/tb";
 import { Button } from "@/components/ui/button";
 import { A } from "@solidjs/router";
+import { IconBrandGithub, IconBrandRust } from "@/lib/icons";
 
 export default function Navbar() {
 	return (
@@ -30,7 +30,7 @@ export default function Navbar() {
 								size="sm"
 								aria-label="Rust"
 								class="h-10 w-10 p-0">
-								<TbBrandRust size={24} />
+								<IconBrandRust size={24} />
 							</Button>
 						</a>
 						<a
@@ -42,7 +42,7 @@ export default function Navbar() {
 								size="sm"
 								aria-label="GitHub"
 								class="h-10 w-10 p-0">
-								<TbBrandGithub size={24} />
+								<IconBrandGithub size={24} />
 							</Button>
 						</a>
 					</div>

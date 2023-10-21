@@ -12,8 +12,8 @@ import {
 	Scripts,
 	Title
 } from "solid-start";
-import Navbar from "./components/navbar";
 import "./root.css";
+import Navbar from "@/components/Navbar";
 
 export default function Root() {
 	return (

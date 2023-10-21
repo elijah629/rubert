@@ -8,15 +8,14 @@ import {
 	SheetTrigger
 } from "@/components/ui/sheet";
 import { As } from "@kobalte/core";
-import { TbDots, TbFreezeColumn } from "solid-icons/tb";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue
-} from "./ui/select";
+} from "@/components/ui/select";
 import NewSessionButton from "./NewSessionButton";
 import DeleteSessionButton from "./DeleteSessionButton";
 import {
@@ -46,6 +45,7 @@ import {
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import AddSolve from "./AddSolve";
+import { IconFreezeColumn, IconDots } from "@/lib/icons";
 
 export default function Sessions(props: {
 	session: string | undefined;
@@ -65,7 +65,7 @@ export default function Sessions(props: {
 						size="sm"
 						class="gap-2">
 						<span class="hidden sm:inline">Sessions</span>
-						<TbFreezeColumn size={24} />
+						<IconFreezeColumn size={24} />
 					</As>
 				</SheetTrigger>
 				<SheetContent
@@ -267,7 +267,7 @@ function SolveMenu(props: {
 					variant="ghost"
 					class="h-8 w-8 p-0"
 					aria-label="Solve actions">
-					<TbDots size={16} />
+					<IconDots size={16} />
 				</As>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent>

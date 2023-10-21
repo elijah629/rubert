@@ -1,5 +1,5 @@
-import { Cube, FaceletColor, wasm_facelets } from "@/lib/cube";
-import { Button } from "./ui/button";
+import { Cube, wasm_facelets } from "@/lib/cube";
+import { Button } from "@/components/ui/button";
 
 export default function SolveButton(props: { cube: Cube }) {
 	return (

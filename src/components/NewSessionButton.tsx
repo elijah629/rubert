@@ -11,8 +11,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { TbPlus } from "solid-icons/tb";
 import { createSignal } from "solid-js";
+import { IconPlus } from "@/lib/icons";
 
 export default function NewSessionButton(props: {
 	onCreate: (name: string) => void;
@@ -29,7 +29,7 @@ export default function NewSessionButton(props: {
 					component={Button}
 					class="gap-2">
 					New
-					<TbPlus size={20} />
+					<IconPlus size={20} />
 				</As>
 			</DialogTrigger>
 			<DialogContent>
