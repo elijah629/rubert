@@ -295,7 +295,20 @@ impl Algorithim {
         self.0.len()
     }
 
-    /// WIP WIP WIP
+    pub fn reverse(self) -> Self {
+        self.0
+            .into_iter()
+            .map(|x| {
+                let count = 4 - x.count();
+                let face = x.face();
+                Move::from_face_and_count(face, count)
+            })
+            .rev()
+            .collect::<Vec<_>>()
+            .into()
+    }
+
+    /*/// WIP WIP WIP
     pub fn simplify(self) -> Self {
         let mut simplified = self.0.iter().map(|&x| Some(x)).collect::<Box<_>>();
 
@@ -322,7 +335,6 @@ impl Algorithim {
         //         .fold(
         //             self.0.clone().iter().map(|&x| Some(x)).collect::<Vec<_>>(),
         //             |mut simplified, (i, cm)| {
-        //                 println!("H");
         //                 if let Some(cm) = cm {
         //                     let cm: Move = cm;
         //                     let same_face_index = simplified.iter().position(|m| match m {
@@ -343,7 +355,7 @@ impl Algorithim {
         //         .map(|&x| x)
         //         .collect(),
         // )
-    }
+    }*/
 }
 
 impl From<Vec<Move>> for Algorithim {

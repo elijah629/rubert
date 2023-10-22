@@ -1,11 +1,14 @@
 import CubeNet from "@/components/CubeNet";
 import { Card } from "@/components/ui/card";
 import { Cube, Face, FaceletColor } from "@/lib/cube";
-import { createEffect, createSignal, on, onMount } from "solid-js";
+import { createEffect, createSignal, on, onCleanup, onMount } from "solid-js";
 import { scan_cube } from "@/lib/scanning";
 import SolveButton from "@/components/SolveButton";
 import ColorPicker from "@/components/ColorPicker";
 import { useIsRouting } from "solid-start";
+
+// Firefox does not have requestVideoFrameCallback
+import "rvfc-polyfill";
 
 export default function Scan() {
 	let canvas!: HTMLCanvasElement;
@@ -38,7 +41,49 @@ export default function Scan() {
 		return cube;
 	});
 
+	const canplay = () => {
+		const tmp_canvas = document.createElement("canvas");
+		const ctx = tmp_canvas.getContext("2d", {
+			willReadFrequently: true
+		});
+
+		tmp_canvas.height = canvas.height = video.height = video.videoHeight;
+		tmp_canvas.width = canvas.width = video.width = video.videoWidth;
+
+		const frame = new cv.Mat(
+			video.videoHeight,
+			video.videoWidth,
+			cv.CV_8UC4
+		);
+
+		function update() {
+			ctx?.drawImage(video, 0, 0);
+
+			frame.data.set(
+				ctx?.getImageData(0, 0, tmp_canvas.height, tmp_canvas.width)
+					.data
+			);
+
+			const cube_partial = scan_cube(frame);
+			if (cube_partial) {
+				setCube(cube => {
+					cube_partial.forEach((facelets, face) => {
+						cube.set(face, facelets);
+					});
+					return cube;
+				});
+			}
+
+			cv.imshow(canvas, frame);
+			video.requestVideoFrameCallback(update);
+		}
+
+		video.requestVideoFrameCallback(update);
+	};
+
 	onMount(async () => {
+		await import("/js/opencv.js?url");
+
 		const getUserMedia: typeof navigator.mediaDevices.getUserMedia =
 			window.navigator.mediaDevices?.getUserMedia.bind(
 				window.navigator.mediaDevices
@@ -60,55 +105,15 @@ export default function Scan() {
 
 		video.srcObject = media;
 
-		video.addEventListener("canplay", () => {
-			const tmp_canvas = document.createElement("canvas");
-			const ctx = tmp_canvas.getContext("2d", {
-				willReadFrequently: true
-			});
+		video.addEventListener("canplay", canplay);
+	});
 
-			tmp_canvas.height =
-				canvas.height =
-				video.height =
-					video.videoHeight;
-			tmp_canvas.width = canvas.width = video.width = video.videoWidth;
-
-			const frame = new cv.Mat(
-				video.videoHeight,
-				video.videoWidth,
-				cv.CV_8UC4
-			);
-
-			function update() {
-				ctx?.drawImage(video, 0, 0);
-
-				frame.data.set(
-					ctx?.getImageData(0, 0, tmp_canvas.height, tmp_canvas.width)
-						.data
-				);
-
-				const cube_partial = scan_cube(frame);
-				if (cube_partial) {
-					setCube(cube => {
-						cube_partial.forEach((facelets, face) => {
-							cube.set(face, facelets);
-						});
-						return cube;
-					});
-				}
-
-				cv.imshow(canvas, frame);
-				video.requestVideoFrameCallback(update);
-			}
-
-			video.requestVideoFrameCallback(update);
-		});
+	onCleanup(() => {
+		video.removeEventListener("canplay", canplay);
 	});
 
 	return (
 		<>
-			<script
-				type="text/javascript"
-				src="/js/opencv.js"></script>
 			<Card class="mb-4 flex flex-col justify-between p-4 sm:h-80 sm:flex-row">
 				<canvas
 					ref={canvas}

@@ -32,7 +32,7 @@ pub fn solve(facelets: &[u8]) -> Result<Uint8ClampedArray, Error> {
     let state = State::try_from(&cube)?;
     // let pruning_table = PruningTable::default();
     // let move_table = MoveTable::default();
-    let mut solver = Solver::new(&MOVE_TABLE, &PRUNING_TABLE, GODS_NUMBER + 3); // adding so we dont search for too long
+    let mut solver = Solver::new(&MOVE_TABLE, &PRUNING_TABLE, GODS_NUMBER + 3); // adding 3 so we dont search for too long
     let solution = solver.solve(state).ok_or(Error::NoSolution)?;
 
     // Serialize the solution into bytes to send to JS
@@ -48,26 +48,14 @@ pub fn scramble_3x3x3() -> Uint8ClampedArray {
     let mut rng = thread_rng();
     let mut state = SOLVED_STATE;
 
-    for m in (0..20).scan(None, |last_move, _| {
-        let possible_moves = match *last_move {
-            Some(m) => MOVES
-                .iter()
-                .filter(|x| !x.face_eq(m))
-                .cloned()
-                .collect::<Vec<_>>(),
-            None => MOVES.to_vec(),
-        };
-
-        let move_choice = possible_moves.choose(&mut rng);
-        *last_move = move_choice.cloned();
-
-        Some(*move_choice.unwrap())
+    for m in (0..30).map(|_| {
+        MOVES.choose(&mut rng).unwrap()
     }) {
-        state *= m.into();
+        state *= (*m).into();
     }
 
-    let mut solver = Solver::new(&MOVE_TABLE, &PRUNING_TABLE, 25); // 25 is standard scramble I think
-    let solution = solver.solve(state).unwrap();
+    let mut solver = Solver::new(&MOVE_TABLE, &PRUNING_TABLE, 25); 
+    let solution = solver.solve(state).unwrap().reverse();
 
     // Serialize the solution into bytes to send to JS
     let mut bytes: Box<[u8]> = solution.into();

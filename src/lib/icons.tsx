@@ -1,33 +1,35 @@
 // This file will remain here until solid-icons is fixed to work with solid@^1.8.0
 // Icons from tabler icons
 
-import { JSX } from "solid-js";
+import { Component, JSX, splitProps } from "solid-js";
 
 export interface IconProps
 	extends Partial<
 		JSX.IntrinsicElements & JSX.SvgSVGAttributes<SVGSVGElement>
 	> {
 	size?: string | number;
-	strokeWidth?: string | number;
-	class?: string;
 }
 
-function I(children: JSX.Element): (props: IconProps) => JSX.Element {
-	return props => (
-		<svg
-			ref={props.ref}
-			xmlns="http://www.w3.org/2000/svg"
-			width={props.size ?? 24}
-			height={props.size ?? 24}
-			viewBox="0 0 24 24"
-			stroke-width={props.strokeWidth ?? props["stroke-width"] ?? 2}
-			stroke="currentColor"
-			fill="none"
-			stroke-linecap="round"
-			stroke-linejoin="round">
-			{children}
-		</svg>
-	);
+function I(children: JSX.Element): Component<IconProps> {
+	return props => {
+		const [local, others] = splitProps(props, ["size"]);
+		return (
+			<svg
+				ref={props.ref}
+				xmlns="http://www.w3.org/2000/svg"
+				width={local.size ?? 24}
+				height={local.size ?? 24}
+				viewBox="0 0 24 24"
+				stroke-width="2"
+				stroke="currentColor"
+				fill="none"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				{...others}>
+				{children}
+			</svg>
+		);
+	};
 }
 
 export const IconPlus = I(<path d="M12 5v14m-7-7h14" />);

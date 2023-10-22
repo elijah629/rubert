@@ -50,21 +50,29 @@ export default function InteractiveCube() {
 		const raycaster = new THREE.Raycaster();
 		const pointer = new THREE.Vector2();
 
-		canvas.addEventListener("mousemove", event => {
-			let canvasBounds = canvas.getBoundingClientRect();
-			pointer.x =
-				((event.clientX - canvasBounds.left) /
-					(canvasBounds.right - canvasBounds.left)) *
-					2 -
-				1;
-			pointer.y =
-				-(
-					(event.clientY - canvasBounds.top) /
-					(canvasBounds.bottom - canvasBounds.top)
-				) *
-					2 +
-				1;
-		});
+		{
+			const mousemove = (e: MouseEvent) => {
+				let canvasBounds = canvas.getBoundingClientRect();
+				pointer.x =
+					((e.clientX - canvasBounds.left) /
+						(canvasBounds.right - canvasBounds.left)) *
+						2 -
+					1;
+				pointer.y =
+					-(
+						(e.clientY - canvasBounds.top) /
+						(canvasBounds.bottom - canvasBounds.top)
+					) *
+						2 +
+					1;
+			};
+
+			canvas.addEventListener("mousemove", mousemove);
+
+			onCleanup(() => {
+				canvas.removeEventListener("mousemove", mousemove);
+			});
+		}
 
 		const renderer = new THREE.WebGLRenderer({
 			canvas: canvas,
@@ -94,7 +102,9 @@ export default function InteractiveCube() {
 				composer.setSize(canvas.width, canvas.height);
 				renderer.setSize(canvas.width, canvas.height);
 			};
+
 			window.addEventListener("resize", resize);
+
 			onCleanup(() => {
 				window.removeEventListener("resize", resize);
 			});
@@ -169,45 +179,52 @@ export default function InteractiveCube() {
 			controls.enablePan = false;
 		}
 
-		canvas.addEventListener("click", () => {
-			if (color() === null) {
-				return;
-			}
-			raycaster.setFromCamera(pointer, camera);
-			const intersects = raycaster.intersectObjects(scene.children);
-			const colors = geometry.getAttribute("color").array;
-
-			for (let i = 0; i < intersects.length; i++) {
-				const faceIndex = intersects[i]?.faceIndex!;
-				const face = Math.floor(Math.floor(faceIndex / 2) / 9);
-				const mapper = face_orientation_map.get(face)!;
-				const facelet = mapper[Math.floor(faceIndex / 2) % 9];
-
-				setCube(cube => {
-					const new_face = cube.get(face)!;
-					new_face[facelet] = color()!;
-					cube.set(face, new_face);
-
-					return cube;
-				});
-
-				const rgb = facelet_rgb.get(color()!)!;
-				const x = Math.floor(faceIndex / 2);
-				for (const i of Array.from(
-					{ length: 3 * 2 },
-					(_, i) => i + x * 6
-				)) {
-					colors[i * 3 + 0] = rgb[0];
-					colors[i * 3 + 1] = rgb[1];
-					colors[i * 3 + 2] = rgb[2];
+		{
+			const click = () => {
+				if (color() === null) {
+					return;
 				}
-			}
+				raycaster.setFromCamera(pointer, camera);
+				const intersects = raycaster.intersectObjects(scene.children);
+				const colors = geometry.getAttribute("color").array;
 
-			geometry.setAttribute(
-				"color",
-				new THREE.BufferAttribute(colors, 3, true)
-			);
-		});
+				for (let i = 0; i < intersects.length; i++) {
+					const faceIndex = intersects[i]?.faceIndex!;
+					const face = Math.floor(Math.floor(faceIndex / 2) / 9);
+					const mapper = face_orientation_map.get(face)!;
+					const facelet = mapper[Math.floor(faceIndex / 2) % 9];
+
+					setCube(cube => {
+						const new_face = cube.get(face)!;
+						new_face[facelet] = color()!;
+						cube.set(face, new_face);
+
+						return cube;
+					});
+
+					const rgb = facelet_rgb.get(color()!)!;
+					const x = Math.floor(faceIndex / 2);
+					for (const i of Array.from(
+						{ length: 3 * 2 },
+						(_, i) => i + x * 6
+					)) {
+						colors[i * 3 + 0] = rgb[0];
+						colors[i * 3 + 1] = rgb[1];
+						colors[i * 3 + 2] = rgb[2];
+					}
+				}
+
+				geometry.setAttribute(
+					"color",
+					new THREE.BufferAttribute(colors, 3, true)
+				);
+			};
+
+			canvas.addEventListener("click", click);
+			onCleanup(() => {
+				canvas.removeEventListener("click", click);
+			});
+		}
 
 		function render() {
 			light.position.set(

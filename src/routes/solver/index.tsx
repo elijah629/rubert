@@ -2,11 +2,11 @@ import { Card } from "@/components/ui/card";
 import { A } from "@solidjs/router";
 import styles from "./solver.module.css";
 import { IconCamera, IconCube, IconKeyboard, IconProps } from "@/lib/icons";
-import { JSX } from "solid-js";
+import { Component } from "solid-js";
 
 function OptionCard(props: {
 	href: string;
-	icon: (props: IconProps) => JSX.Element;
+	icon: Component<IconProps>;
 	title: string;
 	description: string;
 }) {

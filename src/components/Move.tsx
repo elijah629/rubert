@@ -18,10 +18,17 @@ import F3 from "@/icons/F3.svg";
 import B1 from "@/icons/B1.svg";
 import B2 from "@/icons/B2.svg";
 import B3 from "@/icons/B3.svg";
+import { JSX, splitProps } from "solid-js";
 
-export default function Move(props: { move: CMove }) {
+export default function Move(
+	props: { move: CMove } & Partial<
+		JSX.IntrinsicElements & JSX.ImgHTMLAttributes<HTMLImageElement>
+	>
+) {
+	const [local, others] = splitProps(props, ["move", "alt", "src"]);
 	return (
 		<img
+			{...others}
 			alt={CMove[props.move]
 				.replace("1", "")
 				.replace("2", " two")
@@ -46,7 +53,7 @@ export default function Move(props: { move: CMove }) {
 					B1,
 					B2,
 					B3
-				][props.move]
+				][local.move]
 			}></img>
 	);
 }

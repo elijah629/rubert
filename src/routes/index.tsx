@@ -22,11 +22,11 @@ import Move from "@/components/Move";
 import { Card } from "@/components/ui/card";
 import { avg_of_n, cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/seperator";
+import { Separator } from "@/components/ui/separator";
 import { scramblers } from "@/lib/scramblers";
 import Sessions from "@/components/Sessions";
 import ImportScramble from "@/components/ImportScramble";
-import { IconDownload, IconRefresh } from "@/lib/icons";
+import { IconRefresh } from "@/lib/icons";
 
 export interface Solve {
 	time: number;
@@ -294,21 +294,33 @@ export default function Timer() {
 					class={cn(
 						"flex gap-2 overflow-auto p-2 transition",
 						timerState() === TimerState.Running && "blur grayscale",
-						scrambleIcons() ? "[&>*]:w-14" : "justify-center"
+						!scrambleIcons() && "justify-center"
 					)}>
 					<For each={scramble()}>
-						{x => (
-							<Show
-								when={scrambleIcons()}
-								fallback={
-									<>
-										{CMove[x]
-											.replace("1", "")
-											.replace("3", "'") + " "}
-									</>
-								}>
-								<Move move={x} />
-							</Show>
+						{(x, i) => (
+							<>
+								<Show
+									when={scrambleIcons()}
+									fallback={
+										<>
+											{CMove[x]
+												.replace("1", "")
+												.replace("3", "'") + " "}
+										</>
+									}>
+									<Move
+										class="w-14"
+										move={x}
+									/>
+								</Show>
+								<Show
+									when={
+										i() !== scramble()!.length - 1 &&
+										(i() + 1) % 3 === 0
+									}>
+									<Separator orientation="vertical" />
+								</Show>
+							</>
 						)}
 					</For>
 				</div>
