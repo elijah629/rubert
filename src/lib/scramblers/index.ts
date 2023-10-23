@@ -31,7 +31,7 @@ export const scramblers: Map<string, () => Move[] | Promise<Move[]>> = new Map([
 				],
 				[
 					[Move.L3, Move.U3, Move.L1],
-					[Move.L3, Move.U1, Move.L3],
+					[Move.L3, Move.U1, Move.L1],
 					[Move.L1, Move.U1, Move.L3],
 					[Move.L1, Move.U3, Move.L3]
 				]
