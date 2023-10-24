@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
+		"lib": ["ESNext", "DOM", "WebWorker"],
 		"esModuleInterop": true,
 		"target": "ESNext",
 		"module": "ESNext",

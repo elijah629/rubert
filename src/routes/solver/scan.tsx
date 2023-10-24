@@ -109,7 +109,9 @@ export default function Scan() {
 	});
 
 	onCleanup(() => {
-		video.removeEventListener("canplay", canplay);
+		if (video) {
+			video.removeEventListener("canplay", canplay);
+		}
 	});
 
 	return (
