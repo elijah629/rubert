@@ -42,7 +42,7 @@ export default defineConfig({
 			}
 		}),
 		solid({
-			// adapter: vercel()
+			adapter: vercel()
 		})
 	],
 	build: {

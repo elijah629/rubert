@@ -28,4 +28,4 @@ gitignore
 Thumbs.db
 
 bun.lockb
-dist-dev
+dev-dist
