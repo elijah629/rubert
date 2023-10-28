@@ -62,7 +62,7 @@ export default function Solve() {
 							.reduce((a, c) => a + c, 0)}{" "}
 						QTM moves
 					</h2>
-					<Card class="flex flex-wrap gap-2 overflow-auto p-4">
+					<Card class="flex gap-2 overflow-auto p-4">
 						<For each={[...solution()!]}>
 							{(x, i) => (
 								<>
