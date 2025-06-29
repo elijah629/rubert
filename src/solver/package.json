@@ -1,15 +1,16 @@
 {
   "name": "solver",
+  "type": "module",
   "collaborators": [
     "elijah629 <62805599+elijah629@users.noreply.github.com>"
   ],
-  "version": "0.1.0",
+  "version": "0.2.0",
   "files": [
     "solver_bg.wasm",
     "solver.js",
     "solver.d.ts"
   ],
-  "module": "solver.js",
+  "main": "solver.js",
   "types": "solver.d.ts",
   "sideEffects": [
     "./snippets/*"
