@@ -20,7 +20,8 @@ const moveMap: Record<CMove, string> = {
   [CMove.B2]: "/icons/B2.svg",
   [CMove.B3]: "/icons/B3.svg",
 };
-import { JSX, splitProps } from "solid-js";
+import { splitProps } from "solid-js";
+import { JSX } from "solid-js/jsx-runtime";
 
 export default function Move(
 	props: { move: CMove } & Partial<

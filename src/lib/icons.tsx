@@ -1,8 +1,8 @@
 // This file will remain here until solid-icons is fixed to work with solid@^1.8.0
 // Icons from tabler icons
 
-import { Component, JSX, splitProps } from "solid-js";
-
+import { Component, splitProps } from "solid-js";
+import { JSX } from "solid-js/jsx-runtime";
 export interface IconProps
 	extends Partial<
 		JSX.IntrinsicElements & JSX.SvgSVGAttributes<SVGSVGElement>
