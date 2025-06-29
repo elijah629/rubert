@@ -27,19 +27,19 @@
     "tailwindcss-animate": "1.0.7",
     "typescript": "5.2.2",
     "vite": "4.5.0",
-    "workbox-window": "^7.3.0"
+    "workbox-window": "^7.0.0"
   },
   "dependencies": {
     "@kobalte/core": "0.11.1",
     "@solidjs/meta": "0.28.6",
     "@solidjs/router": "0.8.3",
-    "@vercel/analytics": "^1.5.0",
+    "@vercel/analytics": "^1.4.1",
     "idb": "7.1.1",
     "rvfc-polyfill": "^1.0.7",
     "solid-js": "1.8.3",
     "solid-start": "0.3.7",
     "solid-start-vercel": "0.3.7",
     "three": "0.157.0",
-    "vite-plugin-pwa": "^0.16.7"
+    "vite-plugin-pwa": "^0.16.5"
   }
 }
